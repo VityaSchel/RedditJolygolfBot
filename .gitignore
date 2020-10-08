@@ -1,0 +1,7 @@
+logs/**
+resources/data/**
+resources/picture/**
+secrets/**
+tests/**
+.htaccess
+!.gitkeep
