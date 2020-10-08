@@ -1,16 +1,16 @@
 <?php
 
-define('WORK_DIR', file_get_contents("./secrets/work_dir.txt"));
-$resp = file_get_contents(file_get_contents("./secrets/vk_api.txt")."-141715625");
+define('WORK_DIR', file_get_contents(dirname(__FILE__)."/secrets/work_dir.txt"));
+$resp = file_get_contents(file_get_contents(WORK_DIR."secrets/vk_api.txt")."-141715625");
 $resp = json_decode($resp, true);
 
 foreach($resp['response']['items'] as $item){
   $id = $item['id'];
-  $idlast = file_get_contents("JolyBell_last_posted_id.txt");
+  $idlast = file_get_contents(WORK_DIR."JolyBell_last_posted_id.txt");
   if($id == $idlast){
     die("Nothing to do");
   }
-  file_put_contents("JolyBell_last_posted_id.txt", $id);
+  file_put_contents(WORK_DIR."JolyBell_last_posted_id.txt", $id);
 
   if($item['marked_as_ads'] == "1"){
     die("Ads");
@@ -53,11 +53,11 @@ foreach($resp['response']['items'] as $item){
   $comments = $item['comments']['count'];
   $views = $item['views']['count'];
   $lin = $item['from_id']."_".$item['id'];
-  file_put_contents("./resources/data/JolyBell.txt", $type.';'.$image.';'.$likes.';'.$reposts.';'.$comments.';'.$views.';'.base64_encode($title).';'.$lin);
+  file_put_contents(WORK_DIR."resources/data/JolyBell.txt", $type.';'.$image.';'.$likes.';'.$reposts.';'.$comments.';'.$views.';'.base64_encode($title).';'.$lin);
   if($type == 'img'){
     $url = $image;
-    file_put_contents("./resources/picture/JolyBell.jpg", file_get_contents($url));
+    file_put_contents(WORK_DIR."resources/picture/JolyBell.jpg", file_get_contents($url));
   }
-  file_put_contents("./logs/JolyBell_python.txt", shell_exec('python3 '.WORK_DIR.'JolyBell.py').PHP_EOL, FILE_APPEND);
+  file_put_contents(WORK_DIR."logs/JolyBell_python.txt", shell_exec('python3 '.WORK_DIR.'JolyBell.py').PHP_EOL, FILE_APPEND);
 }
 ?>
