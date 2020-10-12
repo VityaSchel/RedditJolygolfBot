@@ -4,26 +4,32 @@ Reddit bot for [r/Jolygolf](https://www.reddit.com/r/Jolygolf/). Subreddit about
 ## Short overview
 ### Root files
 **NaPriemeUShevcova.php, AlexeyShevcov.php, JolyBell.php, BananoviyRai.php**\
-PHP scripts are working with VKontakte API and filtering data from fetched response
+These PHP scripts are executing **api_request.php** script with specified parameters. They sheduled in cron.
 
-**NaPriemeUShevcova.py, AlexeyShevcov.py, JolyBell.py, BananoviyRai.py**\
-Python scripts are working with Reddit API and posts submissions and comments to sub
+**api_request.php**\
+This PHP script work with VKontakte API and filtering data from fetched response
+
+**reddit_post.py**\
+This Python scripts work with Reddit API and posts submissions and comments to sub
 
 **ItpediaYoutube.php**\
-This script makes request to YouTube API to get last video on [Itpedia's channel](https://www.youtube.com/user/itpediachannel)
+This script executing **youtube_api.php** with specified parameters to get video from [Itpedia's channel](https://www.youtube.com/user/itpediachannel). It sheduled in cron.
 
-**ItpediaYoutube.py**\
+**youtube_api.php**\
+This script makes request to YouTube API to get last video in playlist.
+
+**reddit_youtube_video_post.py**\
 This script post link to video to subreddit
 
 **AlexeyShevcov_last_posted_id.txt, NaPriemeUShevcova_last_posted_id.txt, ItpediaYoutube_last_posted_id.txt, JolyBell_last_posted_id.txt, BananoviyRai_last_posted_id.txt**\
-Files to compare fetched ID from API to cached (last post), used by \*.php files
+Files to compare fetched ID from API to cached (last post), used by **api_request.php** files
 
 ### logs (directory)
 Directory for logging\
 *Ignored in git, do not place anything here*
 
 ### resources (directory)
-Data to transfer between \*.php and \*.py scripts\
+Data to transfer between **api_request.php** and **reddit_post.py** scripts\
 *Do not place anything here*
 
 #### resources/data
@@ -35,7 +41,7 @@ Data format:\
 
 #### resources/picture
 **NaPriemeUShevcova.jpg, AlexeyShevcov.jpg, ItpediaYoutube.jpg, JolyBell.jpg, BananoviyRai.jpg**\
-Pictures in posts in most available quality, downloaded by \*.php script from VK server to later upload to reddit server via PRAW\
+Pictures in posts in most available quality, downloaded by **api_request.php** script from VK server to later upload to reddit server via PRAW\
 *Ignored in git, do not place anything here*
 
 ### secrets (directory)
