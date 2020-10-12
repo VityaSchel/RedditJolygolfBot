@@ -55,11 +55,11 @@ reposts = str(infs[3]);
 comments = str(infs[4]);
 views = str(infs[5]);
 
-flairtext = "{source} | {l} :l: | {r} :r: | {v} :e:".format(source=source_name, l=likes, r=reposts, v=views)
+flairtext = "{source} | {l} :l: | {c} :c: | {r} :r: | {v} :e:".format(source=source_name, l=likes, c=comments, r=reposts, v=views)
 if(len(flairtext) > 64):
-    flairtext = "{source} |{l}:l: | {r}:r: | {v}:e:".format(source=source_name, l=likes, r=reposts, v=views)
+    flairtext = "{source} |{l}:l: | {c}:c: | {r}:r: | {v}:e:".format(source=source_name, l=likes, c=comments, r=reposts, v=views)
     if(len(flairtext) > 64):
-        flairtext = "{source} | {l}:l: | {r}:r: | {v}:e:".format(source=source_name_short, l=likes, r=reposts, v=views)
+        flairtext = "{source} | {l}:l: | {c}:c: | {r}:r: | {v}:e:".format(source=source_name_short, l=likes, c=comments, r=reposts, v=views)
 
 submission.flair.select("2ea55bd8-e3e6-11ea-8a5c-0e7cceef0c57", flairtext)
 
