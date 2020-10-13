@@ -4,11 +4,12 @@ Make sure you have php 7.2, python 3 and last version of PRAW installed on linux
 2. Clone this repository
 3. Delete any sources you want. Source is 1 \*.php file and 1 \*_last_posted.txt file where \* is the same name.
 4. Add any sources you want. Source is \*.php file that you shedule which executing **api_request.php** file with specified paramenters.
-4. Paste client_id in /secrets/reddit_client_id.txt, client_secret in /secrets/reddit_client_secret.txt, account password in reddit_password.txt and path to the root of this repository in /secrets/work_dir.txt
-5. Now you have to find API endpoint URL to get posts from original source. In case you using VKontakte, it should be something like this `https://api.vk.com/method/wall.get?access_token={access_token}&v={version}&owner_id={owner_id}`. Remove {owner_id} from this url to append this later in *.php script and place URL in /secrets/vk_api.txt
-6. Change subreddit from *r/jolygolf* to yours in **reddit_post.py** and **reddit_youtube_video_post.py** scripts
-7. Don't forget to approve your account and make it mod of subreddit, because reddit have 8 minutes cooldown for non-mods.
-8. Shedule job to execute \*.php file every 30 minutes (longpoll)
+5. Paste client_id in /secrets/reddit_client_id.txt, client_secret in /secrets/reddit_client_secret.txt, account password in /secrets/reddit_password.txt and path to the root of this repository in /secrets/work_dir.txt
+6. Now you have to find API endpoint URL to get posts from original source. In case you using VKontakte, it should be something like this `https://api.vk.com/method/wall.get?access_token={access_token}&v={version}&owner_id={owner_id}`. Remove {owner_id} from this url to append it later in api_request.php script and place URL in /secrets/vk_api.txt\
+If you don't want to use youtube API, delete **youtube_api.php** and **reddit_youtube_video_post.py** files, otherwise, paste youtube api endpoint to /secrets/youtube_api.txt, it should be something like this `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=1&key={your api key}&playlistId={channel uploads playlist id}`, remove {channel uploads playlist id} from this url to append it later in **youtube_api.php**
+7. Change subreddit from *r/jolygolf* to yours in **reddit_post.py** and **reddit_youtube_video_post.py** scripts
+8. Don't forget to approve account, from which you created app in first step in subreddit settings and make it mod of selected subreddit, otherwise reddit will give you 8 minutes cooldown every time you post something or comment.
+9. Shedule job to execute \*.php script (step 4) every 30 minutes
 
 # How it all works
 **api_request.php** script makes GET request to API and then gets information from response\
