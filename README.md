@@ -1,6 +1,12 @@
 # RedditJolygolfBot
 Reddit bot for [r/Jolygolf](https://www.reddit.com/r/Jolygolf/). Subreddit about Russian blogger Alexei Shevcov. Posts images, polls, links from different sources (incl. VK, YouTube)
 
+## How to use it?
+If you want to use it for your subreddit, check [this step-by-step tutorial](HowToSetup.md)
+
+## Master branch
+Master branch contains legacy code which I don't recommend to use. Instead, use new_version branch which has many source scripts merged in **api_request.php** and **reddit_post.py** files
+
 ## Short overview
 ### Root files
 **NaPriemeUShevcova.php, AlexeyShevcov.php, JolyBell.php, BananoviyRai.php**\
