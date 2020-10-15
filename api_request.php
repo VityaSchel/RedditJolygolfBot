@@ -36,6 +36,9 @@ foreach($resp['response']['items'] as $item){
   if(strpos($item['text'],"wasd") > -1){
     die("Ads");
   }
+  if(strpos($item['text'],"youtu.be") > -1){
+    die("Possible duplicate");
+  }
   $title = str_replace(";",",",$item['text']);
   if($title == ""){
     $title = str_replace("_", " ",$argv[3]);
