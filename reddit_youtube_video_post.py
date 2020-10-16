@@ -14,7 +14,7 @@ client_secret_s = client_secret_f.read();
 password_f = open(work_dir+"secrets/reddit_password.txt", mode="r", encoding="utf-8")
 password_s = password_f.read();
 
-f = open(work_dir+"resources/data/"+source_spec+"_last_posted_id.txt", mode="r", encoding="utf-8")
+f = open(work_dir+"resources/data/"+source_spec+".txt", mode="r", encoding="utf-8")
 infs = f.read().split(';', 6);
 
 reddit = praw.Reddit(client_id=client_id_s,
