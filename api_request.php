@@ -1,11 +1,22 @@
 <?php
 
-// filepath syntax: work_dir/api_request.php -88245281 NaPriemeUShevcova На_приеме_у_Шевцова Паблик
+// filepath syntax: work_dir/api_request.php --id -88245281 --sourcespec NaPriemeUShevcova --sourcename На_приеме_у_Шевцова --sourceshort Паблик
+// options --flairid {flair id} and --logging 
+
+$longopts = array(
+  "id:",
+  "sourcespec:",
+  "sourcename:",
+  "sourceshort::",
+  "flairid::",
+  "logging::"
+);
+$options = getops(null, $longopts);
 
 define('WORK_DIR', file_get_contents(dirname(__FILE__)."/secrets/work_dir.txt"));
-$sourceID = $argv[1];
+$sourceID = $options['id'];
 
-if(empty($argv[1])){die("Argument 1 incorrect");}
+if(empty($options['id'])){die("Argument 1 incorrect");}
 
 $resp = file_get_contents(file_get_contents(WORK_DIR."secrets/vk_api.txt").$sourceID);
 $resp = json_decode($resp, true);
@@ -18,11 +29,11 @@ if($resp['response']['items'][0]['is_pinned'] == 1){
 
 foreach($resp['response']['items'] as $item){
   $id = $item['id'];
-  $idlast = file_get_contents(WORK_DIR.$argv[2]."_last_posted_id.txt");
+  $idlast = file_get_contents(WORK_DIR.$options['sourcespec']."_last_posted_id.txt");
   if($id == $idlast){
     die("Nothing to do");
   }
-  file_put_contents(WORK_DIR.$argv[2]."_last_posted_id.txt", $id);
+  file_put_contents(WORK_DIR.$options['sourcespec']."_last_posted_id.txt", $id);
 
   if($item['marked_as_ads'] == "1"){
     die("Ads");
@@ -41,7 +52,7 @@ foreach($resp['response']['items'] as $item){
   }
   $title = str_replace(";",",",$item['text']);
   if($title == ""){
-    $title = str_replace("_", " ",$argv[3]);
+    $title = str_replace("_", " ",$options['sourcename']);
   }
   $attachs = $item['attachments'];
   $type = "";
@@ -74,11 +85,20 @@ foreach($resp['response']['items'] as $item){
   $comments = $item['comments']['count'];
   $views = $item['views']['count'];
   $lin = $item['from_id']."_".$item['id'];
-  file_put_contents(WORK_DIR."resources/data/".$argv[2].".txt", $type.';'.$image.';'.$likes.';'.$reposts.';'.$comments.';'.$views.';'.base64_encode($title).';'.$lin);
+  file_put_contents(WORK_DIR."resources/data/".$options['sourcespec'].".txt", $type.';'.$image.';'.$likes.';'.$reposts.';'.$comments.';'.$views.';'.base64_encode($title).';'.$lin);
   if($type == 'img'){
     $url = $image;
-    file_put_contents(WORK_DIR.'resources/picture/'.$argv[2].'.jpg', file_get_contents($url));
+    file_put_contents(WORK_DIR.'resources/picture/'.$options['sourcespec'].'.jpg', file_get_contents($url));
   }
-  file_put_contents(WORK_DIR."logs/".$argv[2]."_python.txt", shell_exec('python3 '.WORK_DIR.'reddit_post.py '.$argv[2].' '.$argv[3].' '.$argv[4]).PHP_EOL, FILE_APPEND);
+  if(strlen($options['flairid']) < 1){
+    $flairid = "not-specified";
+  } else {
+    $flairid = $options['flairid'];
+  }
+  if($options['logging']){
+  file_put_contents(WORK_DIR."logs/".$options['sourcespec']."_python.txt", shell_exec('python3 '.WORK_DIR.'reddit_post.py '.$options['sourcespec'].' '.$options['sourcename'].' '.$options['sourceshort'].' '.$flairid).PHP_EOL, FILE_APPEND);
+  } else {
+    shell_exec('python3 '.WORK_DIR.'reddit_post.py '.$options['sourcespec'].' '.$options['sourcename'].' '.$options['sourceshort'].' '.$flairid);
+  }
 }
 ?>

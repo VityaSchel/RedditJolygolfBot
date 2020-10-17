@@ -1,5 +1,5 @@
 <?php
 
-exec("php7.2 ".dirname(__FILE__)."/api_request.php -88245281 NaPriemeUShevcova На_приеме_у_Шевцова Паблик");
+exec('php7.2 '.dirname(__FILE__).'/api_request.php --id -88245281 --sourcespec NaPriemeUShevcova --sourcename На_приеме_у_Шевцова --sourceshort Паблик --flairid "2ea55bd8-e3e6-11ea-8a5c-0e7cceef0c57" --logging');
 
 ?>

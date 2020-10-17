@@ -3,12 +3,13 @@ import base64
 import re
 import sys
 
-# filepath syntax: work_dir/reddit_post.py NaPriemeUShevcova На_приеме_у_Шевцова Паблик
+# filepath syntax: work_dir/reddit_post.py NaPriemeUShevcova На_приеме_у_Шевцова Паблик flairid
 
 work_dir = sys.argv[0].split("reddit_post.py")[0];
 source_spec = sys.argv[1];
 source_name = sys.argv[2].replace("_"," ");
 source_name_short = sys.argv[3].replace("_"," ");
+flairid = sys.argv[4];
 
 client_id_f = open(work_dir+"secrets/reddit_client_id.txt", mode="r", encoding="utf-8")
 client_id_s = client_id_f.read();
@@ -55,13 +56,15 @@ reposts = str(infs[3]);
 comments = str(infs[4]);
 views = str(infs[5]);
 
+if(flairid != "not-specified"){
 flairtext = "{source} | {l} :l: | {c} :c: | {r} :r: | {v} :e:".format(source=source_name, l=likes, c=comments, r=reposts, v=views)
 if(len(flairtext) > 64):
     flairtext = "{source} |{l}:l: | {c}:c: | {r}:r: | {v}:e:".format(source=source_name, l=likes, c=comments, r=reposts, v=views)
     if(len(flairtext) > 64):
         flairtext = "{source} | {l}:l: | {c}:c: | {r}:r: | {v}:e:".format(source=source_name_short, l=likes, c=comments, r=reposts, v=views)
 
-submission.flair.select("2ea55bd8-e3e6-11ea-8a5c-0e7cceef0c57", flairtext)
+submission.flair.select(flairid, flairtext)
+}
 
 urlID = infs[7].split("_")[1]
 urlFull = "https://jolybot.utidteam.com/away.php?url={urlid}&source={sourcespec}".format(urlid=urlID, sourcespec=source_spec)
