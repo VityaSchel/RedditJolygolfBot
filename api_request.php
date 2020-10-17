@@ -1,17 +1,18 @@
 <?php
 
 // filepath syntax: work_dir/api_request.php --id -88245281 --sourcespec NaPriemeUShevcova --sourcename На_приеме_у_Шевцова --sourceshort Паблик
-// options --flairid {flair id} and --logging 
+// options --flairid="{flair id}" and --logging
 
 $longopts = array(
   "id:",
   "sourcespec:",
   "sourcename:",
-  "sourceshort::",
+  "sourceshort:",
   "flairid::",
-  "logging::"
+  "logging"
 );
-$options = getops(null, $longopts);
+$options = getopt(null, $longopts);
+var_dump($options);
 
 define('WORK_DIR', file_get_contents(dirname(__FILE__)."/secrets/work_dir.txt"));
 $sourceID = $options['id'];
@@ -96,7 +97,7 @@ foreach($resp['response']['items'] as $item){
     $flairid = $options['flairid'];
   }
   if($options['logging']){
-  file_put_contents(WORK_DIR."logs/".$options['sourcespec']."_python.txt", shell_exec('python3 '.WORK_DIR.'reddit_post.py '.$options['sourcespec'].' '.$options['sourcename'].' '.$options['sourceshort'].' '.$flairid).PHP_EOL, FILE_APPEND);
+    file_put_contents(WORK_DIR."logs/".$options['sourcespec']."_python.txt", shell_exec('python3 '.WORK_DIR.'reddit_post.py '.$options['sourcespec'].' '.$options['sourcename'].' '.$options['sourceshort'].' '.$flairid).PHP_EOL, FILE_APPEND);
   } else {
     shell_exec('python3 '.WORK_DIR.'reddit_post.py '.$options['sourcespec'].' '.$options['sourcename'].' '.$options['sourceshort'].' '.$flairid);
   }

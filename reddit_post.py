@@ -56,15 +56,14 @@ reposts = str(infs[3]);
 comments = str(infs[4]);
 views = str(infs[5]);
 
-if(flairid != "not-specified"){
-flairtext = "{source} | {l} :l: | {c} :c: | {r} :r: | {v} :e:".format(source=source_name, l=likes, c=comments, r=reposts, v=views)
-if(len(flairtext) > 64):
-    flairtext = "{source} |{l}:l: | {c}:c: | {r}:r: | {v}:e:".format(source=source_name, l=likes, c=comments, r=reposts, v=views)
+if(flairid != "not-specified"):
+    flairtext = "{source} | {l} :l: | {c} :c: | {r} :r: | {v} :e:".format(source=source_name, l=likes, c=comments, r=reposts, v=views)
     if(len(flairtext) > 64):
-        flairtext = "{source} | {l}:l: | {c}:c: | {r}:r: | {v}:e:".format(source=source_name_short, l=likes, c=comments, r=reposts, v=views)
+        flairtext = "{source} |{l}:l: | {c}:c: | {r}:r: | {v}:e:".format(source=source_name, l=likes, c=comments, r=reposts, v=views)
+        if(len(flairtext) > 64):
+            flairtext = "{source} | {l}:l: | {c}:c: | {r}:r: | {v}:e:".format(source=source_name_short, l=likes, c=comments, r=reposts, v=views)
 
-submission.flair.select(flairid, flairtext)
-}
+    submission.flair.select(flairid, flairtext)
 
 urlID = infs[7].split("_")[1]
 urlFull = "https://jolybot.utidteam.com/away.php?url={urlid}&source={sourcespec}".format(urlid=urlID, sourcespec=source_spec)
