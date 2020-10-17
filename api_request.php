@@ -1,7 +1,7 @@
 <?php
 
 // filepath syntax: work_dir/api_request.php --id -88245281 --sourcespec NaPriemeUShevcova --sourcename На_приеме_у_Шевцова --sourceshort Паблик
-// options --flairid="{flair id}" and --logging
+// options --flairid="{flair id}" and --ignorecache
 
 $longopts = array(
   "id:",
@@ -9,10 +9,9 @@ $longopts = array(
   "sourcename:",
   "sourceshort:",
   "flairid::",
-  "logging"
+  "ignorecache"
 );
 $options = getopt(null, $longopts);
-var_dump($options);
 
 define('WORK_DIR', file_get_contents(dirname(__FILE__)."/secrets/work_dir.txt"));
 $sourceID = $options['id'];
@@ -31,8 +30,10 @@ if($resp['response']['items'][0]['is_pinned'] == 1){
 foreach($resp['response']['items'] as $item){
   $id = $item['id'];
   $idlast = file_get_contents(WORK_DIR.$options['sourcespec']."_last_posted_id.txt");
-  if($id == $idlast){
-    die("Nothing to do");
+  if(array_key_exists('ignorecache', $options) != true){
+    if($id == $idlast){
+      die("Nothing to do");
+    }
   }
   file_put_contents(WORK_DIR.$options['sourcespec']."_last_posted_id.txt", $id);
 
@@ -96,10 +97,6 @@ foreach($resp['response']['items'] as $item){
   } else {
     $flairid = $options['flairid'];
   }
-  if($options['logging']){
-    file_put_contents(WORK_DIR."logs/".$options['sourcespec']."_python.txt", shell_exec('python3 '.WORK_DIR.'reddit_post.py '.$options['sourcespec'].' '.$options['sourcename'].' '.$options['sourceshort'].' '.$flairid).PHP_EOL, FILE_APPEND);
-  } else {
-    shell_exec('python3 '.WORK_DIR.'reddit_post.py '.$options['sourcespec'].' '.$options['sourcename'].' '.$options['sourceshort'].' '.$flairid);
-  }
+  file_put_contents(WORK_DIR."logs/".$options['sourcespec']."_python.txt", shell_exec('python3 '.WORK_DIR.'reddit_post.py '.$options['sourcespec'].' '.$options['sourcename'].' '.$options['sourceshort'].' '.$flairid).PHP_EOL, FILE_APPEND);
 }
 ?>
