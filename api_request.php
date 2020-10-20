@@ -31,6 +31,8 @@ foreach($resp['response']['items'] as $item){
   $id = $item['id'];
   $idlast = file_get_contents(WORK_DIR.$options['sourcespec']."_last_posted_id.txt");
   if(array_key_exists('ignorecache', $options) != true){
+    // optional boolean you set when executing this script
+    // it allows to skip checking for last posted id (use it for testing)
     if($id == $idlast){
       die("Nothing to do");
     }
@@ -40,8 +42,10 @@ foreach($resp['response']['items'] as $item){
   if($item['marked_as_ads'] == "1"){
     die("Ads");
   }
-  if(count($item['copy_history']) > 0){
-    die("Repost");
+  if(!empty($item['copy_history'])){
+    if(count($item['copy_history']) > 0){
+      die("Repost");
+    }
   }
   if(strpos($item['text'],"WASD") > -1){
     die("Ads");
@@ -61,14 +65,19 @@ foreach($resp['response']['items'] as $item){
   if($attachs != ""){
     foreach($attachs as $atch){
       switch($atch['type']){
-        case 'photo':
+        case "photo":
+          $type = "img";
           $image = $atch['photo']['sizes'][count($atch['photo']['sizes'])-1]['url'];
-          $type = 'img';
           break;
 
-        case 'doc':
-          $title .= "\n [Нажмите сюда, чтобы увидеть прикрепеленный к оригиналу GIF](".$atch['doc']['url'].")";
-          $type = 'text';
+        case "doc":
+          if($atch['doc']['type'] == 3) {
+            // weird vk api; 3 means gif-document
+            $type = "gif";
+            $title .= "\n [Нажмите сюда, чтобы увидеть прикрепеленный к оригиналу GIF](".$atch['doc']['url'].")";
+          } else {
+            $type = "text";
+          }
           break;
 
         case "poll":
@@ -77,9 +86,14 @@ foreach($resp['response']['items'] as $item){
             $type .= "#".str_replace("#", "", $atch['poll']['answers'][$j]['text']);
           }
           break;
+
+        case "video":
+          $type = 'video:'.$atch['video']['owner_id']."_".$atch['video']['id'];
+          break;
       }
     }
   } else {
+    // unsupported type
     $type = 'text';
   }
   $likes = $item['likes']['count'];
@@ -87,6 +101,10 @@ foreach($resp['response']['items'] as $item){
   $comments = $item['comments']['count'];
   $views = $item['views']['count'];
   $lin = $item['from_id']."_".$item['id'];
+  if(empty($image)) {
+    $image = "";
+    // TODO: fix this later
+  }
   file_put_contents(WORK_DIR."resources/data/".$options['sourcespec'].".txt", $type.';'.$image.';'.$likes.';'.$reposts.';'.$comments.';'.$views.';'.base64_encode($title).';'.$lin);
   if($type == 'img'){
     $url = $image;
