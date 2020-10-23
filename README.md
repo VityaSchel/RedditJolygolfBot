@@ -1,6 +1,8 @@
 # RedditJolygolfBot
 Reddit bot for [r/Jolygolf](https://www.reddit.com/r/Jolygolf/). Subreddit about Russian blogger Alexei Shevcov. Posts images, polls, links from different sources (incl. VK, YouTube)
 
+![RedditJolygolfBot](https://jolybot.utidteam.com/jolygolf_banner.png)
+
 ## How to use it?
 If you want to use it for your subreddit, check [this step-by-step tutorial](HowToSetup.md)
 
