@@ -2,23 +2,23 @@
 
 // filepath syntax: work_dir/youtube_api.php UU6bTF68IAV1okfRfwXIP1Cg{this is playlist id} ItpediaYoutube itpedia
 
-define('WORK_DIR', file_get_contents(dirname(__FILE__)."/secrets/work_dir.txt"));
-$source = $argv[2];
+define('WORK_DIR', substr(file_get_contents(dirname(__FILE__)."/secrets/work_dir.txt"), 0, -1));
+$source_spec = $argv[2];
 
-$youtubeapiresp = file_get_contents(file_get_contents(WORK_DIR."secrets/youtube_api.txt".$argv[1]));
-$youtubeapi = json_decode($youtubeapiresp, true);
+$youtube_api_response = file_get_contents(file_get_contents(WORK_DIR."/secrets/youtube_api.txt".$argv[1]));
+$youtube_api = json_decode($youtube_api_response, true);
 
-$snippet = $youtubeapi['items'][0]['snippet'];
-
-$title = $snippet['title'];
-$id = $snippet['resourceId']['videoId'];
-$lastid = file_get_contents($source."_last_posted_id.txt");
-if($id == $lastid){
+$snippet_data = $youtube_api['items'][0]['snippet'];
+$video_id = $snippet_data['resourceId']['videoId'];
+$last_submitted_id = file_get_contents(WORK_DIR."/".$source_spec."_last_posted_id.txt");
+if($video_id == $last_submitted_id){
   die("Nothing to do");
 }
-$link = "https://www.youtube.com/watch?v=".$id;
-file_put_contents(WORK_DIR."resources/data/".$source.".txt", $link.';'.$title);
-shell_exec('python3 '.WORK_DIR.'reddit_youtube_video_post.py '.$argv[2].' '.$argv[3]);
-file_put_contents($source."_last_posted_id.txt", $id);
+$video_name = $snippet_data['title'];
+
+$video_url = "https://www.youtube.com/watch?v=".$video_id;
+file_put_contents(WORK_DIR."/resources/data/".$source_spec.".txt", $video_url.';'.$video_name);
+shell_exec('python3 '.WORK_DIR.'/reddit_youtube_video_post.py '.$source_spec.' '.$argv[3]);
+file_put_contents(WORK_DIR."/".$source_spec."_last_posted_id.txt", $video_id);
 
 ?>

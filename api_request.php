@@ -13,108 +13,110 @@ $longopts = array(
 );
 $options = getopt(null, $longopts);
 
-define('WORK_DIR', file_get_contents(dirname(__FILE__)."/secrets/work_dir.txt"));
-$sourceID = $options['id'];
+define('WORK_DIR', substr(file_get_contents(dirname(__FILE__)."/secrets/work_dir.txt"), 0, -1));
+$source_post_id = $options['id'];
 
-if(empty($options['id'])){die("Argument 1 incorrect");}
-
-$resp = file_get_contents(file_get_contents(WORK_DIR."secrets/vk_api.txt").$sourceID);
-$resp = json_decode($resp, true);
-
-if($resp['response']['items'][0]['is_pinned'] == 1){
-  // post pinned, skip to newest after it
-  $resp = file_get_contents(file_get_contents(WORK_DIR."secrets/vk_api.txt").$sourceID."&offset=1");
-  $resp = json_decode($resp, true);
+if(empty($options['id'])){
+  die("Argument 'ID' is not defined");
 }
 
-foreach($resp['response']['items'] as $item){
-  $id = $item['id'];
-  $idlast = file_get_contents(WORK_DIR.$options['sourcespec']."_last_posted_id.txt");
+$vk_api_response_raw = file_get_contents(file_get_contents(WORK_DIR."/secrets/vk_api.txt").$source_post_id);
+$vk_api_response = json_decode($vk_api_response_raw, true);
+
+if($vk_api_response['response']['items'][0]['is_pinned'] == 1){
+  // post pinned, skip to newest after it
+  $vk_api_response_raw = file_get_contents(file_get_contents(WORK_DIR."/secrets/vk_api.txt").$source_post_id."&offset=1");
+  $vk_api_response = json_decode($vk_api_response_raw, true);
+}
+
+foreach($vk_api_response['response']['items'] as $vk_post){
+  $post_id = $vk_post['id'];
+  $last_submitted_id = file_get_contents(WORK_DIR."/".$options['sourcespec']."_last_posted_id.txt");
+
+  // ignorecache is optional boolean you set when executing this script
+  // it allows to skip checking for last posted id (use it for testing)
   if(array_key_exists('ignorecache', $options) != true){
-    // optional boolean you set when executing this script
-    // it allows to skip checking for last posted id (use it for testing)
-    if($id == $idlast){
+    if($post_id == $last_submitted_id){
       die("Nothing to do");
     }
   }
-  file_put_contents(WORK_DIR.$options['sourcespec']."_last_posted_id.txt", $id);
+  file_put_contents(WORK_DIR."/".$options['sourcespec']."_last_posted_id.txt", $post_id);
 
-  if($item['marked_as_ads'] == "1"){
+  if($vk_post['marked_as_ads'] == "1"){
     die("Ads");
   }
-  if(!empty($item['copy_history'])){
-    if(count($item['copy_history']) > 0){
+  if(!empty($vk_post['copy_history'])){
+    if(count($vk_post['copy_history']) > 0){
       die("Repost");
     }
   }
-  if(strpos($item['text'],"WASD") > -1){
+  if(strpos($vk_post['text'],"WASD") > -1){
     die("Ads");
   }
-  if(strpos($item['text'],"wasd") > -1){
+  if(strpos($vk_post['text'],"wasd") > -1){
     die("Ads");
   }
-  if(strpos($item['text'],"youtu.be") > -1){
+  if(strpos($vk_post['text'], "youtu.be") > -1){
     die("Possible duplicate");
   }
-  $title = str_replace(";",",",$item['text']);
-  if($title == ""){
-    $title = str_replace("_", " ",$options['sourcename']);
+
+  $submission_title = str_replace(";",",", $vk_post['text']);
+  if($submission_title == ""){
+    $submission_title = str_replace("_", " ", $options['sourcename']);
   }
-  $attachs = $item['attachments'];
-  $type = "";
-  if($attachs != ""){
-    foreach($attachs as $atch){
-      switch($atch['type']){
+  $post_attachments = $vk_post['attachments'];
+  $submission_type = "";
+  $post_image = "";
+  if($post_attachments != ""){
+    foreach($post_attachments as $attachment){
+      switch($attachment['type']){
         case "photo":
-          $type = "img";
-          $image = $atch['photo']['sizes'][count($atch['photo']['sizes'])-1]['url'];
+          $submission_type = "img";
+          $post_image = $attachment['photo']['sizes'][count($attachment['photo']['sizes'])-1]['url'];
           break;
 
         case "doc":
-          if($atch['doc']['type'] == 3) {
+          if($attachment['doc']['type'] == 3) {
             // weird vk api; 3 means gif-document
-            $type = "gif";
-            $title .= "\n [Нажмите сюда, чтобы увидеть прикрепеленный к оригиналу GIF](".$atch['doc']['url'].")";
+            $submission_type = "gif";
+            $submission_title .= "\n [Нажмите сюда, чтобы увидеть прикрепеленный к оригиналу GIF](".$atch['doc']['url'].")";
           } else {
-            $type = "text";
+            $submission_type = "text";
           }
           break;
 
         case "poll":
-          $type = 'poll:'.str_replace("#", "", $atch['poll']['answers'][0]['text']);
-          for($j = 1; $j < count($atch['poll']['answers']); $j++){
-            $type .= "#".str_replace("#", "", $atch['poll']['answers'][$j]['text']);
+          $submission_type = 'poll:'.str_replace("#", "", $attachment['poll']['answers'][0]['text']);
+          for($j = 1; $j < count($attachment['poll']['answers']); $j++){
+            $submission_type .= "#".str_replace("#", "", $attachment['poll']['answers'][$j]['text']);
           }
           break;
 
         case "video":
-          $type = 'video:'.$atch['video']['owner_id']."_".$atch['video']['id'];
+          $submission_type = 'video:'.$attachment['video']['owner_id']."_".$attachment['video']['id'];
           break;
       }
     }
   } else {
     // unsupported type
-    $type = 'text';
+    $submission_type = 'text';
   }
-  $likes = $item['likes']['count'];
-  $reposts = $item['reposts']['count'];
-  $comments = $item['comments']['count'];
-  $views = $item['views']['count'];
-  $lin = $item['from_id']."_".$item['id'];
-  if(empty($image)) {
-    $image = "";
-    // TODO: fix this later
+
+  $post_likes = $item['likes']['count'];
+  $post_reposts = $item['reposts']['count'];
+  $post_comments = $item['comments']['count'];
+  $post_views = $item['views']['count'];
+  $post_url = $vk_post['from_id']."_".$vk_post['id'];
+
+  file_put_contents(WORK_DIR."/resources/data/".$options['sourcespec'].".txt", $submission_type.';'.$post_image.';'.$post_likes.';'.$post_reposts.';'.$post_comments.';'.$post_views.';'.base64_encode($submission_title).';'.$post_url);
+  if($submission_type == "img"){
+    file_put_contents(WORK_DIR.'/resources/picture/'.$options['sourcespec'].'.jpg', file_get_contents($image));
   }
-  file_put_contents(WORK_DIR."resources/data/".$options['sourcespec'].".txt", $type.';'.$image.';'.$likes.';'.$reposts.';'.$comments.';'.$views.';'.base64_encode($title).';'.$lin);
-  if($type == 'img'){
-    $url = $image;
-    file_put_contents(WORK_DIR.'resources/picture/'.$options['sourcespec'].'.jpg', file_get_contents($url));
-  }
-  if(strlen($options['flairid']) < 1){
-    $flairid = "not-specified";
+  if(strlen($options["flairid"]) < 1){
+    $flair_id = "not-specified";
   } else {
-    $flairid = $options['flairid'];
+    $flair_id = $options['flairid'];
   }
-  file_put_contents(WORK_DIR."logs/".$options['sourcespec']."_python.txt", shell_exec('python3 '.WORK_DIR.'reddit_post.py '.$options['sourcespec'].' '.$options['sourcename'].' '.$options['sourceshort'].' '.$flairid).PHP_EOL, FILE_APPEND);
+  file_put_contents(WORK_DIR."/logs"."/".$options['sourcespec']."_python.txt", shell_exec('python3 '.WORK_DIR.'/reddit_post.py '.$options['sourcespec'].' '.$options['sourcename'].' '.$options['sourceshort'].' '.$flair_id).PHP_EOL, FILE_APPEND);
 }
 ?>

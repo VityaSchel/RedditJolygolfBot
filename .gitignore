@@ -6,3 +6,5 @@ tests/**
 .htaccess
 !.gitkeep
 *_last_posted_id.txt
+**.DS_Store
+.idea/**
