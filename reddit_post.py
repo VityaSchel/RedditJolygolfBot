@@ -7,7 +7,7 @@ import logging
 
 WORK_DIR = sys.argv[0].split("reddit_post.py")[0][:-1];
 
-logging.basicConfig(filename=WORK_DIR + 'logs/reddit_post.log', level=logging.DEBUG)
+logging.basicConfig(filename=WORK_DIR + '/logs/reddit_post.log', level=logging.DEBUG)
 for handler in logging.root.handlers[:]:
     logging.root.removeHandler(handler)
 
@@ -58,7 +58,7 @@ try:
         else:
             title = reddit_submission.src_name_full + " (текст записи в комментариях)";
             post_comment_with_source_text = True;
-        image = WORK_DIR + 'resources/picture/' + reddit_submission.src_spec + '.jpg';
+        image = WORK_DIR + '/resources/picture/' + reddit_submission.src_spec + '.jpg';
         submitted_instance = reddit_api.subreddit('jolygolf').submit_image(title, image);
     else:
         if source_post.post_type == "poll":

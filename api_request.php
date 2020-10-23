@@ -102,15 +102,15 @@ foreach($vk_api_response['response']['items'] as $vk_post){
     $submission_type = 'text';
   }
 
-  $post_likes = $item['likes']['count'];
-  $post_reposts = $item['reposts']['count'];
-  $post_comments = $item['comments']['count'];
-  $post_views = $item['views']['count'];
+  $post_likes = $vk_post['likes']['count'];
+  $post_reposts = $vk_post['reposts']['count'];
+  $post_comments = $vk_post['comments']['count'];
+  $post_views = $vk_post['views']['count'];
   $post_url = $vk_post['from_id']."_".$vk_post['id'];
 
   file_put_contents(WORK_DIR."/resources/data/".$options['sourcespec'].".txt", $submission_type.';'.$post_image.';'.$post_likes.';'.$post_reposts.';'.$post_comments.';'.$post_views.';'.base64_encode($submission_title).';'.$post_url);
   if($submission_type == "img"){
-    file_put_contents(WORK_DIR.'/resources/picture/'.$options['sourcespec'].'.jpg', file_get_contents($image));
+    file_put_contents(WORK_DIR.'/resources/picture/'.$options['sourcespec'].'.jpg', file_get_contents($post_image));
   }
   if(strlen($options["flairid"]) < 1){
     $flair_id = "not-specified";
