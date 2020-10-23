@@ -23,7 +23,7 @@ if(empty($options['id'])){
 $vk_api_response_raw = file_get_contents(file_get_contents(WORK_DIR."/secrets/vk_api.txt").$source_post_id);
 $vk_api_response = json_decode($vk_api_response_raw, true);
 
-if($vk_api_response['response']['items'][0]['is_pinned'] == 1){
+if(!empty($vk_api_response['response']['items'][0]['is_pinned'])){
   // post pinned, skip to newest after it
   $vk_api_response_raw = file_get_contents(file_get_contents(WORK_DIR."/secrets/vk_api.txt").$source_post_id."&offset=1");
   $vk_api_response = json_decode($vk_api_response_raw, true);

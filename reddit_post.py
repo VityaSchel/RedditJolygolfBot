@@ -22,8 +22,11 @@ try:
 
     class FetchedPost:
         def __init__(self, post_type, image_url, likes, reposts, comments, views, title, source_post_id):
-            self.post_type = post_type.split(":")[0];
-            self.extra_data = post_type.split(":")[1];
+            post_type_field = post_type.split(":");
+            # TODO: split post type and extra data to different field, also data needs to be in JSON
+            self.post_type = post_type_field[0];
+            if(len(post_type_field) > 1):
+                self.extra_data = post_type_field[1];
             self.image_url = image_url;
             self.likes_count = likes;
             self.reposts_count = reposts;
@@ -48,7 +51,7 @@ try:
     source_post_raw = open(WORK_DIR + "/resources/data/" + reddit_submission.src_spec + ".txt", mode="r",
                            encoding="utf-8").read().split(';', 7);
     source_post = FetchedPost(source_post_raw[0], source_post_raw[1], source_post_raw[2], source_post_raw[3],
-                              source_post_raw[4], source_post_raw[5], source_post_raw[6]);
+                              source_post_raw[4], source_post_raw[5], source_post_raw[6], source_post_raw[7]);
 
     post_comment_with_source_text = False;
     archive_submission = False;

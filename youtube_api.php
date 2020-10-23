@@ -5,7 +5,7 @@
 $longopts = array(
   "playlistID:",
   "sourcespec:",
-  "sourcename:"
+  "sourcename:",
   "ignorecache"
 );
 $options = getopt(null, $longopts);

@@ -21,5 +21,5 @@ if(len(post_data[1]) < 300):
     title = post_data[1];
 else:
     title = "Новое видео на канале "+source_name;
-submitted_instance = reddit.subreddit('jolygolf').submit(title, url=post_data[0], flair_id='6a360654-26d9-11ea-b36f-0ee735f1b64b')
+submitted_instance = reddit_api.subreddit('jolygolf').submit(title, url=post_data[0], flair_id='6a360654-26d9-11ea-b36f-0ee735f1b64b')
 submitted_instance.mod.approve();
