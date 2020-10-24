@@ -119,7 +119,7 @@ try:
     url_post_id = source_post.src_post_id;
     url_post = "https://jolybot.utidteam.com/away.php?url={urlid}&source={sourcespec}".format(urlid=url_post_id,
                                                                                 sourcespec=reddit_submission.src_spec);
-    if post_comment_with_source_text == True:
+    if post_comment_with_source_text == False:
         comment = submitted_instance.reply("[Запись ВКонтакте]({urlFull})".format(urlFull=urlFull))
     else:
         source_post_text = source_post.title.splitlines()
