@@ -83,7 +83,7 @@ try:
         if source_post.post_type == "poll":
             title = reddit_submission.src_name_full
             submitted_instance = reddit_api.subreddit('jolygolf').submit_poll(title, selftext=source_post.title,
-                                                                              options=source_post.poll_data,
+                                                                              options=source_post.poll_data[:6],
                                                                               duration=3)
         else:
             if source_post.post_type == "video":
