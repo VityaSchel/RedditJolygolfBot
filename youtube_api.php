@@ -1,6 +1,7 @@
 <?php
 
 // filepath syntax: work_dir/youtube_api.php --playlistID UU6bTF68IAV1okfRfwXIP1Cg --sourcespec ItpediaYoutube --sourcename itpedia
+// optional --ignorecache
 
 $longopts = array(
   "playlistID:",
