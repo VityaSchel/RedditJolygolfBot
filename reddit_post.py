@@ -4,6 +4,7 @@ import base64
 import re
 import sys
 import logging
+import json
 
 WORK_DIR = sys.argv[0].split("reddit_post.py")[0][:-1]
 
@@ -12,7 +13,7 @@ for handler in logging.root.handlers[:]:
     logging.root.removeHandler(handler)
 
 try:
-    def set_flair(format_index):
+    def get_flair(format_index):
         formats = ["{source_name} | {likes} :l: | {comments} :c: | {reposts} :r: | {views} :e:",
                    "{source_name} | {likes}:l: | {comments}:c: | {reposts}:r: | {views}:e:",
                    "{short_source_name} | {likes}:l: | {comments}:c: | {reposts}:r: | {views}:e:"]
@@ -36,23 +37,19 @@ try:
 
 
     class FetchedPost:
-        def __init__(self, post_type, image_url, post_likes, post_reposts, post_comments,
+        def __init__(self, post_type, post_likes, post_reposts, post_comments,
                      post_views, post_title, source_post_id):
-            post_type_field = post_type.split(":")
-            # TODO: split post type and extra data to different field, also data needs to be in JSON
-            self.post_type = post_type_field[0]
-            if len(post_type_field) > 1:
-                self.extra_data = post_type_field[1]
-            self.image_url = image_url
+            self.post_type = post_type
+            if "poll_data" in source_post_raw:
+                self.poll_data = source_post_raw['poll_data']
+            if "video_data" in source_post_raw:
+                self.video_data = source_post_raw['video_data']
             self.likes_count = post_likes
             self.reposts_count = post_reposts
             self.comments_count = post_comments
             self.views_count = post_views
             self.title = base64.b64decode(post_title).decode('utf-8')
             self.src_post_id = source_post_id.split("_")[1]
-
-
-    reddit_submission = RedditSubmission(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
 
     bot_id = open(WORK_DIR + "/secrets/reddit_client_id.txt", mode="r", encoding="utf-8").read()
     bot_secret = open(WORK_DIR + "/secrets/reddit_client_secret.txt", mode="r", encoding="utf-8").read()
@@ -64,10 +61,13 @@ try:
                              user_agent='r/Jolygolf bot by /u/Vitya_Schel',
                              username='Jolygolf_bot')
 
-    source_post_raw = open(WORK_DIR + "/resources/data/" + reddit_submission.src_spec + ".txt", mode="r",
-                           encoding="utf-8").read().split(';', 7)
-    source_post = FetchedPost(source_post_raw[0], source_post_raw[1], source_post_raw[2], source_post_raw[3],
-                              source_post_raw[4], source_post_raw[5], source_post_raw[6], source_post_raw[7])
+    reddit_submission = RedditSubmission(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+
+    source_post_raw = json.loads(open(WORK_DIR + "/resources/data/" + reddit_submission.src_spec + ".txt", mode="r",
+                           encoding="utf-8").read())
+    source_post = FetchedPost(source_post_raw['type'], source_post_raw['likes_count'], source_post_raw['reposts_count'],
+                              source_post_raw['comments_count'], source_post_raw['views_count'],
+                              source_post_raw['title'], source_post_raw['post_id'])
 
     post_comment_with_source_text = False
     archive_submission = False
@@ -83,7 +83,7 @@ try:
         if source_post.post_type == "poll":
             title = reddit_submission.src_name_full
             submitted_instance = reddit_api.subreddit('jolygolf').submit_poll(title, selftext=source_post.title,
-                                                                              options=source_post.extra_data.split("#"),
+                                                                              options=source_post.poll_data,
                                                                               duration=3)
         else:
             if source_post.post_type == "video":
@@ -93,15 +93,11 @@ try:
                     title = source_post.title[0:297]+"..."
                     post_comment_with_source_text = True
 
-                video_url_vk_api = "https://vkontakte.ru/video"
-                # url actually looks like https://vk.com/video-12345_10
-                # where -12345 is group id and 10 is video id
-                # but reddit banned vk.com "because of child porn"
-                # well anyway, vkontakte.ru is just an old domain name
-                # if it ever get banned, use your own domain redirect :)
-                # TODO: change to actual upload to v.reddit.com
-                submitted_instance = reddit_api.subreddit('jolygolf').submit(
-                                                                    title, url=video_url_vk_api+source_post.extra_data)
+                submitted_instance = reddit_api.subreddit('jolygolf').submit_video(
+                                                title,
+                                                WORK_DIR+"/resources/video/"+reddit_submission.src_spec+"_video.mp4",
+                                                False,
+                                                WORK_DIR+"/resources/video/"+reddit_submission.src_spec+"_thumbnail.jpg")
             else:
                 # text type or unsupported
                 title = reddit_submission.src_name_full
@@ -120,7 +116,7 @@ try:
         # otherwise, not set flair to submission
         flair_text = ""
         for i in range(0, 3):
-            flair_text = set_flair(i)
+            flair_text = get_flair(i)
             if len(flair_text) <= 64:
                 break
 

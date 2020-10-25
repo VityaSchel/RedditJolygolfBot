@@ -40,14 +40,22 @@ Data to transfer between **api_request.php** and **reddit_post.py** scripts\
 #### resources/data
 **NaPriemeUShevcova.txt, AlexeyShevcov.txt, ItpediaYoutube.txt, JolyBell.txt, BananoviyRai.txt**\
 Data format:\
-`{type(text,poll:..#..,img)};{image url in VK server};{likes count};{reposts count};{comments count};{views count};{title in UTF-8 encoded in base64};{id in vk groupid_postid}`\
-*TODO: Use JSON*\
+`{"type":"text OR img OR gif OR video OR poll","poll_data":["ANSWER1","ANSWER2","ANSWER3"],"video_url":"FOR VIDEO TYPE, USERID_VIDEOID","likes_count":1090,"reposts_count":43,"views_count":11613,"title":"BASE64-ENCODED TEXT","post_id":"USERID_POSTID"}`
 *Ignored in git, do not place anything here*
 
 #### resources/picture
 **NaPriemeUShevcova.jpg, AlexeyShevcov.jpg, ItpediaYoutube.jpg, JolyBell.jpg, BananoviyRai.jpg**\
 Pictures in posts in most available quality, downloaded by **api_request.php** script from VK server to later upload to reddit server via PRAW\
 *Ignored in git, do not place anything here*
+
+#### resources/video
+**NaPriemeUShevcova_thumbnail.jpg, AlexeyShevcov_thumbnail.jpg, ItpediaYoutube_thumbnail.jpg, JolyBell_thumbnail.jpg, BananoviyRai_thumbnail.jpg**\
+Thumbnail of video in max resoultion available, downloaded by **api_request.php** script from VK server\
+
+**NaPriemeUShevcova_video.mp4, AlexeyShevcov_video.mp4, ItpediaYoutube_video.mp4, JolyBell_video.mp4, BananoviyRai_video.mp4**\
+Video in 360p downloaded by **api_request.php** script to upload on Reddit via PRAW\
+
+*Игнорируется, ничего не помещайте здесь*
 
 ### secrets (directory)
 For private data such as passwords, api keys, directories\

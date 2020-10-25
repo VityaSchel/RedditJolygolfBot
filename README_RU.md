@@ -35,13 +35,21 @@
 #### resources/data
 **NaPriemeUShevcova.txt, AlexeyShevcov.txt, ItpediaYoutube.txt, JolyBell.txt, BananoviyRai.txt**\
 Формат любого из файлов:\
-`{тип(text,poll:..#..,img)};{ссылка на изображение на серверах вк};{кол-во лайков};{кол-во репостов};{кол-во комментариев};{кол-во просмотров};{заголовок или текст поста в UTF-8 в base64};{id в вк groupid_postid}`\
-*TODO: Использовать JSON*\
+`{"type":"text OR img OR gif OR video OR poll","poll_data":["ANSWER1","ANSWER2","ANSWER3"],"video_url":"FOR VIDEO TYPE, USERID_VIDEOID","likes_count":1090,"reposts_count":43,"views_count":11613,"title":"BASE64-ENCODED TEXT","post_id":"USERID_POSTID"}`
 *Игнорируется, ничего не помещайте здесь*
 
 #### resources/picture
 **NaPriemeUShevcova.jpg, AlexeyShevcov.jpg, ItpediaYoutube.jpg, JolyBell.jpg, BananoviyRai.jpg**\
 Изображения в максимальном качестве, скачанные скриптом **api_request.php** с сервера ВК и позже загруженные на сервер reddit с помощью PRAW\
+*Игнорируется, ничего не помещайте здесь*
+
+#### resources/video
+**NaPriemeUShevcova_thumbnail.jpg, AlexeyShevcov_thumbnail.jpg, ItpediaYoutube_thumbnail.jpg, JolyBell_thumbnail.jpg, BananoviyRai_thumbnail.jpg**\
+Превью видео, скачанное **api_request.php** с сервера VK\
+
+**NaPriemeUShevcova_video.mp4, AlexeyShevcov_video.mp4, ItpediaYoutube_video.mp4, JolyBell_video.mp4, BananoviyRai_video.mp4**\
+Видео в качестве 360p, скачанное **api_request.php** с сервера VK, чтобы загрузить на реддит через PRAW\
+
 *Игнорируется, ничего не помещайте здесь*
 
 ### secrets (директория)
