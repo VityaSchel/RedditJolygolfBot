@@ -55,7 +55,7 @@ Thumbnail of video in max resoultion available, downloaded by **api_request.php*
 **NaPriemeUShevcova_video.mp4, AlexeyShevcov_video.mp4, ItpediaYoutube_video.mp4, JolyBell_video.mp4, BananoviyRai_video.mp4**\
 Video in 360p downloaded by **api_request.php** script to upload on Reddit via PRAW\
 
-*Игнорируется, ничего не помещайте здесь*
+*Ignored in git, do not place anything here*
 
 ### secrets (directory)
 For private data such as passwords, api keys, directories\
