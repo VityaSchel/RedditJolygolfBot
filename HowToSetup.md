@@ -1,5 +1,6 @@
 # How to setup this bot
-Make sure you have php 7.2, python 3 and last version of PRAW installed on linux
+Make sure you have PHP 7.2, Python 3, last version of [PRAW](https://praw.readthedocs.io/en/latest/), [youtube-dl](https://en.wikipedia.org/wiki/Youtube-dl) installed on Linux (tested on Ubuntu)
+Also make sure all scripts can be executed by python and user that executing php
 1. Go to [Reddit apps](https://www.reddit.com/prefs/apps/) and create new app
 2. Clone this repository
 3. Delete any sources you want. Source is 1 \*.php file and 1 \*_last_posted.txt file where \* is the same name.
@@ -14,6 +15,7 @@ If you don't want to use youtube API, delete **youtube_api.php** and **reddit_yo
 # How it all works
 **api_request.php** script makes GET request to API and then gets information from response\
 it writes picture to /resource/picture/\*.jpg and info such as post text and stats to /resources/data/\*.txt\
+if post's type is video, **api_request.php** downloads video from VK using youtube-dl to /resource/video/\*_video.mp3 and thumbnail to /resource/video/\*_thumbnail.jpg
 then it calls **reddit_post.py** file by executing command `python3 {work_dir const}/reddit_post.py {source name} {flair (source) name} {short flair (source) name}`\
 **reddit_post.py** script reads everything from /secrets/ folder, makes connection to reddit\
 it decides what should post look like (text/image/poll)\
