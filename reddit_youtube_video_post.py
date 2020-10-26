@@ -20,22 +20,22 @@ bot_password = open(WORK_DIR + "/secrets/reddit_password.txt", mode="r", encodin
 reddit_api = praw.Reddit(client_id=bot_id,
                          client_secret=bot_secret,
                          password=bot_password,
-                         user_agent=bot_settings.bot_useragent,
-                         username=bot_settings.bot_username)
+                         user_agent=bot_settings['bot_useragent'],
+                         username=bot_settings['bot_username'])
 
 video_data = open(WORK_DIR+"/resources/data/"+source_spec+".txt", mode="r", encoding="utf-8").read().split(';', 1)
 
 if(len(video_data[1]) < 300):
     title = video_data[1]
-    if title in spoilers_settings.spoilers_words:
-        if spoilers_settings.archive_spoilers_posts:
+    if title in spoilers_settings['spoilers_words']:
+        if spoilers_settings['archive_spoilers_posts']:
             submitted_instance.mod.lock()
-        if spoilers_settings.spolertag_spoilers_posts:
+        if spoilers_settings['spolertag_spoilers_posts']:
             submitted_instance.mod.spoiler()
 else:
-    title = youtube_source_settings.new_video_hint.format(channelname=source_name)
+    title = youtube_source_settings['new_video_hint'].format(channelname=source_name)
 
-submitted_instance = reddit_api.subreddit(bot_settings.subreddit).submit(title,
+submitted_instance = reddit_api.subreddit(bot_settings['subreddit']).submit(title,
                                                                          url=video_data[0])
 
 if flair_id != "not-specified":

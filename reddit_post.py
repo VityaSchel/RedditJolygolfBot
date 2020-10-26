@@ -21,11 +21,11 @@ try:
                                               encoding="utf-8").read())
 
     def get_flair():
-        formats = regular_source_settings.flair_formats
+        formats = regular_source_settings['flair_formats']
         # each of this is shorter than the other one, this way we achieve 64-characters-length flair
 
         flair_template = ""
-        for i in range(0, len(regular_source_settings.flair_formats)):
+        for i in range(0, len(regular_source_settings['flair_formats'])):
             flair_template = formats[i]
             if len(flair_template) <= 64:
                 break
@@ -69,8 +69,8 @@ try:
     reddit_api = praw.Reddit(client_id=bot_id,
                              client_secret=bot_secret,
                              password=bot_password,
-                             user_agent=bot_settings.bot_useragent,
-                             username=bot_settings.bot_username)
+                             user_agent=bot_settings['bot_useragent'],
+                             username=bot_settings['bot_username'])
 
     reddit_submission = RedditSubmission(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
 
@@ -89,11 +89,11 @@ try:
             title = reddit_submission.src_name_full + " (текст записи в комментариях)"
             post_comment_with_source_text = True
         image = WORK_DIR + '/resources/picture/' + reddit_submission.src_spec + '.jpg'
-        submitted_instance = reddit_api.subreddit(bot_settings.subreddit).submit_image(title, image)
+        submitted_instance = reddit_api.subreddit(bot_settings['subreddit']).submit_image(title, image)
     else:
         if source_post.post_type == "poll":
             title = reddit_submission.src_name_full
-            submitted_instance = reddit_api.subreddit(bot_settings.subreddit).submit_poll(title,
+            submitted_instance = reddit_api.subreddit(bot_settings['subreddit']).submit_poll(title,
                                                                                       selftext=source_post.title,
                                                                                       options=source_post.poll_data[:6],
                                                                                       duration=3)
@@ -105,24 +105,24 @@ try:
                     title = source_post.title[0:297]+"..."
                     post_comment_with_source_text = True
 
-                if regular_source_settings.upload_videos_to_reddit:
-                    submitted_instance = reddit_api.subreddit(bot_settings.subreddit).submit_video(
+                if regular_source_settings['upload_videos_to_reddit']:
+                    submitted_instance = reddit_api.subreddit(['subreddit']).submit_video(
                                                title,
                                                WORK_DIR+"/resources/video/"+reddit_submission.src_spec+"_video.mp4",
                                                False,
                                                WORK_DIR+"/resources/video/"+reddit_submission.src_spec+"_thumbnail.jpg")
                 else:
                     video_url_vk_api = "https://vkontakte.ru/video"
-                    submitted_instance = reddit_api.subreddit(bot_settings.subreddit).submit(
+                    submitted_instance = reddit_api.subreddit(bot_settings['subreddit']).submit(
                                                                      title, url=video_url_vk_api+source_post.video_data)
 
             else:
                 # text type or unsupported
                 title = reddit_submission.src_name_full
-                submitted_instance = reddit_api.subreddit(bot_settings.subreddit).submit(title,
-                                                                                         selftext=source_post.title)
+                submitted_instance = reddit_api.subreddit(bot_settings['subreddit']).submit(title,
+                                                                                            selftext=source_post.title)
 
-    if source_post.title in spoilers_settings.spoilers_words:
+    if source_post.title in spoilers_settings['spoilers_words']:
         submission_contains_spoilers = True
 
     likes = str(source_post.likes_count)
@@ -134,15 +134,15 @@ try:
         submitted_instance.flair.select(reddit_submission.flair_id, get_flair())
 
     url_post_id = source_post.src_post_id
-    away_link_url = regular_source_settings.away_link_format
+    away_link_url = regular_source_settings['away_link_format']
     url_post = away_link_url.format(urlid=url_post_id,
                                     src_id=reddit_submission.src_id,
                                     sourcespec=reddit_submission.src_spec)
 
     if not post_comment_with_source_text:
         comment = submitted_instance.reply("[{away_link_hint}]({full_url})".format(
-                                                                 full_url=url_post,
-                                                                 away_link_hint=regular_source_settings.away_link_text))
+                                                              full_url=url_post,
+                                                              away_link_hint=regular_source_settings['away_link_text']))
     else:
         source_post_text = source_post.title.splitlines()
         reddit_submission_text = ""
@@ -153,17 +153,17 @@ try:
 
         comment = submitted_instance.reply(
             "[{away_link_hint}]({full_url}) \n\n{full_text_hint}: {full_text}".format(
-                                                                 away_link_hint=regular_source_settings.away_link_text,
-                                                                 full_url=url_post,
-                                                                 full_text_hint=regular_source_settings.full_text_hint,
-                                                                 full_text=reddit_submission_text))
+                                                               away_link_hint=regular_source_settings['away_link_text'],
+                                                               full_url=url_post,
+                                                               full_text_hint=regular_source_settings['full_text_hint'],
+                                                               full_text=reddit_submission_text))
     comment.mod.distinguish(how='yes', sticky=True)
     comment.mod.approve()
     submitted_instance.mod.approve()
     if submission_contains_spoilers:
-        if spoilers_settings.archive_spoilers_posts:
+        if spoilers_settings['archive_spoilers_posts']:
             submitted_instance.mod.lock()
-        if spoilers_settings.spolertag_spoilers_posts:
+        if spoilers_settings['spolertag_spoilers_posts']:
             submitted_instance.mod.spoiler()
 except RuntimeError as identifier:
     logging.exception('Got exception on main handler')
