@@ -22,6 +22,8 @@ if(empty($options['id'])){
   die("Argument 'ID' is not defined");
 }
 
+$regular_source_settings = json_decode(file_get_contents(WORK_DIR."/configs/regular_source_settings.conf"));
+
 $vk_api_response_raw = file_get_contents(file_get_contents(WORK_DIR."/secrets/vk_api.txt").$source_post_id);
 $vk_api_response = json_decode($vk_api_response_raw, true);
 
@@ -29,6 +31,14 @@ if(!empty($vk_api_response['response']['items'][0]['is_pinned'])){
   // post pinned, skip to newest after it
   $vk_api_response_raw = file_get_contents(file_get_contents(WORK_DIR."/secrets/vk_api.txt").$source_post_id."&offset=1");
   $vk_api_response = json_decode($vk_api_response_raw, true);
+}
+
+function contains($str, array $arr)
+{
+    foreach($arr as $a) {
+        if (stripos($str,$a) !== false) return true;
+    }
+    return false;
 }
 
 foreach($vk_api_response['response']['items'] as $vk_post){
@@ -47,7 +57,7 @@ foreach($vk_api_response['response']['items'] as $vk_post){
   if($vk_post['marked_as_ads'] == "1"){
     die("Ads");
   }
-  if(strpos($vk_post['text'],"WASD") !== FALSE || strpos($vk_post['text'],"wasd") !== FALSE){
+  if(contains($vk_post['text'], $regular_source_settings->ads_words)){
     die("Ads");
   }
   if(!empty($vk_post['copy_history'])){
@@ -82,7 +92,7 @@ foreach($vk_api_response['response']['items'] as $vk_post){
           if($attachment['doc']['type'] == 3) {
             // weird vk api; 3 means gif-document
             $post_data['type'] = "gif";
-            $post_data['title'] .= "\n [Нажмите сюда, чтобы увидеть прикрепеленный к оригиналу GIF](".$atch['doc']['url'].")";
+            $post_data['title'] .= "\n [".$regular_source_settings->gif_link_hint."](".$attachment['doc']['url'].")";
           } else {
             $post_data['type'] = "text";
             //unsupported document
@@ -103,17 +113,19 @@ foreach($vk_api_response['response']['items'] as $vk_post){
           $post_data['type'] = "video";
           $video_url = $attachment['video']['owner_id']."_".$attachment['video']['id'];
           $post_data['video_data'] = $video_url;
-          $thumbnails_variants = $attachment['video']['image'];
-          $thumbnail_url = end($thumbnails_variants)["url"];
-          file_put_contents(WORK_DIR.'/resources/video/'.$options['sourcespec'].'_thumbnail.jpg', file_get_contents($thumbnail_url));
-          // downloading thumbnail
-          if(array_key_exists('skipdownload', $options) != true){
-            exec('youtube-dl https://vk.com/video'.$video_url.' -o '.WORK_DIR.'/resources/video/'.$options['sourcespec'].'_video.mp4 -f "bestvideo[height<=360]+bestaudio/best[height<=360]"');
-            // downloading video
+          if($regular_source_settings->upload_videos_to_reddit) {
+            $thumbnails_variants = $attachment['video']['image'];
+            $thumbnail_url = end($thumbnails_variants)["url"];
+            file_put_contents(WORK_DIR.'/resources/video/'.$options['sourcespec'].'_thumbnail.jpg', file_get_contents($thumbnail_url));
+            // downloading thumbnail
+            if(array_key_exists('skipdownload', $options) != true){
+              exec('youtube-dl https://vk.com/video'.$video_url.' -o '.WORK_DIR.'/resources/video/'.$options['sourcespec'].'_video.mp4 -f "bestvideo[height<='.$regular_source_settings->max_video_resolution.']+bestaudio/best[height<='.$regular_source_settings->max_video_resolution.']"');
+              // downloading video
+            }
+            // skipdownload is optional boolean you set when executing this script
+            // it allows to skip downloading the video
+            // cause it takes 5-10 seconds for really short video
           }
-          // skipdownload is optional boolean you set when executing this script
-          // it allows to skip downloading the video
-          // cause it takes 5-10 seconds for really short video
           break;
 
         default:
@@ -138,6 +150,6 @@ foreach($vk_api_response['response']['items'] as $vk_post){
   } else {
     $flair_id = $options['flairid'];
   }
-  exec('python3 '.WORK_DIR.'/reddit_post.py '.$options['sourcespec'].' '.$options['sourcename'].' '.$options['sourceshort'].' '.$flair_id);
+  exec('python3 '.WORK_DIR.'/reddit_post.py '.$options['id'].' '.$options['sourcespec'].' '.$options['sourcename'].' '.$options['sourceshort'].' '.$flair_id);
 }
 ?>

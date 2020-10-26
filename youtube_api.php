@@ -1,12 +1,13 @@
 <?php
 
 // filepath syntax: work_dir/youtube_api.php --playlistID UU6bTF68IAV1okfRfwXIP1Cg --sourcespec ItpediaYoutube --sourcename itpedia
-// optional --ignorecache
+// optional --flairid "6a360654-26d9-11ea-b36f-0ee735f1b64b" --ignorecache
 
 $longopts = array(
   "playlistID:",
   "sourcespec:",
   "sourcename:",
+  "flairid::",
   "ignorecache"
 );
 $options = getopt(null, $longopts);
@@ -33,11 +34,16 @@ if(array_key_exists('ignorecache', $options) != true){
     die("Nothing to do");
   }
 }
+file_put_contents(WORK_DIR."/".$source_spec."_last_posted_id.txt", $video_id);
 $video_name = $snippet_data['title'];
-
+if(strlen($options["flairid"]) < 1){
+  $flair_id = "not-specified";
+} else {
+  $flair_id = $options['flairid'];
+}
 $video_url = "https://www.youtube.com/watch?v=".$video_id;
 file_put_contents(WORK_DIR."/resources/data/".$source_spec.".txt", $video_url.';'.$video_name);
-shell_exec('python3 '.WORK_DIR.'/reddit_youtube_video_post.py '.$source_spec.' '.$argv[3]);
-file_put_contents(WORK_DIR."/".$source_spec."_last_posted_id.txt", $video_id);
+exec('python3 '.WORK_DIR.'/reddit_youtube_video_post.py '.$source_spec.' '.$$options['sourcename'].' '.$flair_id);
+
 
 ?>
