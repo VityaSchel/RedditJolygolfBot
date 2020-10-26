@@ -72,7 +72,7 @@ try:
                              user_agent=bot_settings['bot_useragent'],
                              username=bot_settings['bot_username'])
 
-    reddit_submission = RedditSubmission(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+    reddit_submission = RedditSubmission(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
 
     source_post_raw = json.loads(open(WORK_DIR + "/resources/data/" + reddit_submission.src_spec + ".txt", mode="r",
                            encoding="utf-8").read())

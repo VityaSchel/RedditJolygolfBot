@@ -1,5 +1,6 @@
 import praw
 import sys
+import json
 
 WORK_DIR = sys.argv[0].split("reddit_youtube_video_post.py")[0][:-1]
 source_spec = sys.argv[1]

@@ -1,6 +1,7 @@
 logs/**
 resources/data/**
 resources/picture/**
+resources/video/**
 secrets/**
 tests/**
 .htaccess

@@ -36,14 +36,15 @@ if(array_key_exists('ignorecache', $options) != true){
 }
 file_put_contents(WORK_DIR."/".$source_spec."_last_posted_id.txt", $video_id);
 $video_name = $snippet_data['title'];
+$flair_id = "";
 if(strlen($options["flairid"]) < 1){
   $flair_id = "not-specified";
 } else {
-  $flair_id = $options['flairid'];
+  $flair_id = $options["flairid"];
 }
 $video_url = "https://www.youtube.com/watch?v=".$video_id;
 file_put_contents(WORK_DIR."/resources/data/".$source_spec.".txt", $video_url.';'.$video_name);
-exec('python3 '.WORK_DIR.'/reddit_youtube_video_post.py '.$source_spec.' '.$$options['sourcename'].' '.$flair_id);
+exec('python3 '.WORK_DIR.'/reddit_youtube_video_post.py '.$source_spec.' '.$options['sourcename'].' '.$flair_id);
 
 
 ?>
