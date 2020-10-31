@@ -41,6 +41,17 @@ function contains($str, array $arr)
     return false;
 }
 
+function download_photo_from_vk($attached_photo, $iteration)
+{
+  global $options;
+  global $post_data;
+
+  $photo_variants = $attached_photo['photo']['sizes'];
+  $post_image = end($photo_variants)['url'];
+  file_put_contents(WORK_DIR.'/resources/picture/'.$options['sourcespec'].'_'.$iteration.'.jpg', file_get_contents($post_image));
+  $post_data['images_count'] = $iteration+1;
+}
+
 foreach($vk_api_response['response']['items'] as $vk_post){
   $post_id = $vk_post['id'];
   $last_submitted_id = file_get_contents(WORK_DIR."/".$options['sourcespec']."_last_posted_id.txt");
@@ -51,8 +62,6 @@ foreach($vk_api_response['response']['items'] as $vk_post){
     }
   }
   file_put_contents(WORK_DIR."/".$options['sourcespec']."_last_posted_id.txt", $post_id);
-  // ignorecache is optional boolean you set when executing this script
-  // it allows to skip checking for last posted id (use it for testing)
 
   if($vk_post['marked_as_ads'] == "1"){
     die("Ads");
@@ -76,66 +85,69 @@ foreach($vk_api_response['response']['items'] as $vk_post){
   $post_data['title'] = base64_encode($post_data['title']);
 
   $post_attachments = $vk_post['attachments'];
-  $post_image = "";
-  if($post_attachments != ""){
-    foreach($post_attachments as $attachment){
-      switch($attachment['type']){
-        case "photo":
-          $post_data['type'] = "img";
-          $photo_variants = $attachment['photo']['sizes'];
-          $post_image = end($photo_variants)['url'];
-          file_put_contents(WORK_DIR.'/resources/picture/'.$options['sourcespec'].'.jpg', file_get_contents($post_image));
-          // downloading photo
-          break;
-
-        case "doc":
-          if($attachment['doc']['type'] == 3) {
-            // weird vk api; 3 means gif-document
-            $post_data['type'] = "gif";
-            $post_data['title'] .= "\n [".$regular_source_settings->gif_link_hint."](".$attachment['doc']['url'].")";
-          } else {
-            $post_data['type'] = "text";
-            //unsupported document
-          }
-          break;
-
-        case "poll":
-          $poll_answers = $attachment['poll']['answers'];
-          $post_data['type'] = "poll";
-          $poll_data = array();
-          for($j = 0; $j < count($poll_answers); $j++){
-            array_push($poll_data, str_replace("#", "", $poll_answers[$j]['text']));
-          }
-          $post_data['poll_data'] = $poll_data;
-          break;
-
-        case "video":
-          $post_data['type'] = "video";
-          $video_url = $attachment['video']['owner_id']."_".$attachment['video']['id'];
-          $post_data['video_data'] = $video_url;
-          if($regular_source_settings->upload_videos_to_reddit) {
-            $thumbnails_variants = $attachment['video']['image'];
-            $thumbnail_url = end($thumbnails_variants)["url"];
-            file_put_contents(WORK_DIR.'/resources/video/'.$options['sourcespec'].'_thumbnail.jpg', file_get_contents($thumbnail_url));
-            // downloading thumbnail
-            if(array_key_exists('skipdownload', $options) != true){
-              exec('youtube-dl https://vk.com/video'.$video_url.' -o '.WORK_DIR.'/resources/video/'.$options['sourcespec'].'_video.mp4 -f "bestvideo[height<='.$regular_source_settings->max_video_resolution.']+bestaudio/best[height<='.$regular_source_settings->max_video_resolution.']"');
-              // downloading video
-            }
-            // skipdownload is optional boolean you set when executing this script
-            // it allows to skip downloading the video
-            // cause it takes 5-10 seconds for really short video
-          }
-          break;
-
-        default:
-          $post_data['type'] = "text";
-          // unsupported type
-          break;
-      }
-    }
-  } else {
+  if(empty($post_attachments)){
     $post_data['type'] = 'text';
+  } else {
+    $max_allowed_attachments = 5;
+    $attachments_saved = 0;
+    $post_data['images_count'] = 0;
+    foreach($post_attachments as $attachment){
+      if($attachments_saved >= $max_allowed_attachments){
+        break;
+      }
+      if($attachments_saved == 0){
+        switch($attachment['type']){
+          case "photo":
+            $post_data['type'] = "img";
+            download_photo_from_vk($attachment, $attachments_saved);
+            break;
+
+          case "doc":
+            if($attachment['doc']['type'] == 3) {
+              // 3 means gif-document in vk api
+              $post_data['type'] = "gif";
+              $post_data['title'] .= "\n [".$regular_source_settings->gif_link_hint."](".$attachment['doc']['url'].")";
+            } else {
+              $post_data['type'] = "text";
+            }
+            break;
+
+          case "poll":
+            $poll_answers = $attachment['poll']['answers'];
+            $post_data['type'] = "poll";
+            $poll_data = array();
+            for($j = 0; $j < count($poll_answers); $j++){
+              array_push($poll_data, str_replace("#", "", $poll_answers[$j]['text']));
+            }
+            $post_data['poll_data'] = $poll_data;
+            break;
+
+          case "video":
+            $post_data['type'] = "video";
+            $video_url = $attachment['video']['owner_id']."_".$attachment['video']['id'];
+            $post_data['video_data'] = $video_url;
+            if($regular_source_settings->upload_videos_to_reddit) {
+              $thumbnails_variants = $attachment['video']['image'];
+              $thumbnail_url = end($thumbnails_variants)["url"];
+              file_put_contents(WORK_DIR.'/resources/video/'.$options['sourcespec'].'_thumbnail.jpg', file_get_contents($thumbnail_url));
+
+              if(array_key_exists('skipdownload', $options) != true){
+                exec('youtube-dl https://vk.com/video'.$video_url.' -o '.WORK_DIR.'/resources/video/'.$options['sourcespec'].'_video.mp4 -f "bestvideo[height<='.$regular_source_settings->max_video_resolution.']+bestaudio/best[height<='.$regular_source_settings->max_video_resolution.']"');
+              }
+            }
+            break;
+
+          default:
+            $post_data['type'] = "text";
+            break;
+        }
+      } else {
+        if($post_data['type'] == "img"){
+          download_photo_from_vk($attachment, $attachments_saved);
+        }
+      }
+      $attachments_saved += 1;
+    }
   }
 
   $post_data['likes_count'] = $vk_post['likes']['count'];

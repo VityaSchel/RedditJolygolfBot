@@ -39,8 +39,8 @@ class OriginalPostSource:
 
 
 class FetchedPost:
-    def __init__(self, post_type, post_likes, post_reposts, post_comments, post_views, post_title, source_post_id,
-                flairid):
+    def __init__(self, post_type, post_likes, post_reposts, post_comments, post_views, post_title,
+                 post_attachments_count, source_post_id, flairid):
         self.post_type = post_type
         if "poll_data" in original_post_raw:
             self.poll_data = original_post_raw['poll_data']
@@ -51,6 +51,7 @@ class FetchedPost:
         self.comments_count = post_comments
         self.views_count = post_views
         self.text = base64.b64decode(post_title).decode('utf-8')
+        self.attachments_count = post_attachments_count
         self.src_post_id = source_post_id.split("_")[1]
         self.flair_id = flairid
 
@@ -62,7 +63,7 @@ def get_flair():
 
     flair_formats = regular_source_settings['flair_formats']
     flair_template = ""
-    for i in range(0, len(flair_formats)):
+    for i in range(len(flair_formats)):
         flair_template = flair_formats[i].format(source_name=original_post_source.src_name_full,
                                                  short_source_name=original_post_source.src_name_short,
                                                  likes=original_post.likes_count,
@@ -86,7 +87,7 @@ def get_title():
         return original_post_source.src_name_full + " (текст записи в комментариях)"
 
 
-def submit_picture():
+def submit_pictures():
     global WORK_DIR
     global original_post_source
     global reddit_submission
@@ -94,8 +95,16 @@ def submit_picture():
     global bot_settings
 
     title = get_title()
-    image = WORK_DIR + '/resources/picture/' + original_post_source.src_spec + '.jpg'
-    reddit_submission.submission = reddit_api.subreddit(bot_settings['subreddit']).submit_image(title, image)
+
+    if original_post.attachments_count == 1:
+        image = WORK_DIR + '/resources/picture/' + original_post_source.src_spec + '_1.jpg'
+        reddit_submission.submission = reddit_api.subreddit(bot_settings['subreddit']).submit_image(title, image)
+    else:
+        images = []
+        for i in range(original_post.attachments_count):
+            images.append({'image_path': WORK_DIR + '/resources/picture/' + original_post_source.src_spec +
+                                                                                               '_' + str(i+1) + '.jpg'})
+        reddit_submission.submission = reddit_api.subreddit(bot_settings['subreddit']).submit_gallery(title, images)
 
 
 def submit_poll():
@@ -157,7 +166,7 @@ def spoilers_test():
 
 
 def text_contains_any_item(subject, items):
-    for i in range(0, len(items)):
+    for i in range(len(items)):
         if items[i] in subject:
             return True
     return False
@@ -226,14 +235,19 @@ def initialize():
     original_post_source = OriginalPostSource(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
     original_post_raw = json.loads(open(WORK_DIR + "/resources/data/" + original_post_source.src_spec + ".txt",
                                         mode="r", encoding="utf-8").read())
-    original_post = FetchedPost(original_post_raw['type'], original_post_raw['likes_count'],
-                                original_post_raw['reposts_count'], original_post_raw['comments_count'],
-                                original_post_raw['views_count'], original_post_raw['title'],
-                                original_post_raw['post_id'], sys.argv[5])
+    original_post = FetchedPost(original_post_raw['type'],
+                                original_post_raw['likes_count'],
+                                original_post_raw['reposts_count'],
+                                original_post_raw['comments_count'],
+                                original_post_raw['views_count'],
+                                original_post_raw['title'],
+                                original_post_raw['images_count'],
+                                original_post_raw['post_id'],
+                                sys.argv[5])
     reddit_submission = RedditSubmission("", False, None)
 
     if original_post.post_type == "img":
-        submit_picture()
+        submit_pictures()
     elif original_post.post_type == "poll":
         submit_poll()
     elif original_post.post_type == "video":

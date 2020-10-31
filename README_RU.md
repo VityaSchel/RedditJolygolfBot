@@ -78,7 +78,19 @@ Check examples in [/configs/](/configs/)
 #### resources/data
 **NaPriemeUShevcova.txt, AlexeyShevcov.txt, ItpediaYoutube.txt, JolyBell.txt, BananoviyRai.txt**\
 Формат любого из файлов:\
-`{"type":"text OR img OR gif OR video OR poll","poll_data":["ANSWER1","ANSWER2","ANSWER3"],"video_url":"FOR VIDEO TYPE, USERID_VIDEOID","likes_count":1090,"reposts_count":43,"views_count":11613,"title":"BASE64-ENCODED TEXT","post_id":"USERID_POSTID"}`
+```yaml
+{
+    "type": "text OR img OR gif OR video OR poll",
+    "poll_data": ["ANSWER1","ANSWER2","ANSWER3"],
+    "video_data": "FOR VIDEO TYPE, USERID_VIDEOID",
+    "likes_count": 1090,
+    "reposts_count": 43,
+    "views_count": 11613,
+    "title": "BASE64-ENCODED TEXT",
+    "images_count": 1,
+    "post_id": "USERID_POSTID"
+}
+```
 
 #### resources/picture
 **NaPriemeUShevcova.jpg, AlexeyShevcov.jpg, ItpediaYoutube.jpg, JolyBell.jpg, BananoviyRai.jpg**\
