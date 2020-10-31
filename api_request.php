@@ -48,8 +48,9 @@ function download_photo_from_vk($attached_photo, $iteration)
 
   $photo_variants = $attached_photo['photo']['sizes'];
   $post_image = end($photo_variants)['url'];
-  file_put_contents(WORK_DIR.'/resources/picture/'.$options['sourcespec'].'_'.$iteration.'.jpg', file_get_contents($post_image));
-  $post_data['images_count'] = $iteration+1;
+  $photo_iter = $iteration+1;
+  file_put_contents(WORK_DIR.'/resources/picture/'.$options['sourcespec'].'_'.$photo_iter.'.jpg', file_get_contents($post_image));
+  $post_data['images_count'] = $photo_iter;
 }
 
 foreach($vk_api_response['response']['items'] as $vk_post){
