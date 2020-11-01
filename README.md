@@ -82,7 +82,7 @@ Data to transfer between **api_request.php** and **reddit_post.py** scripts
 
 #### /resources/data
 **NaPriemeUShevcova.txt, AlexeyShevcov.txt, ItpediaYoutube.txt, JolyBell.txt, BananoviyRai.txt**\
-Data format:\
+Data format:
 ```yaml
 {
     "type": "text OR img OR gif OR video OR poll",
