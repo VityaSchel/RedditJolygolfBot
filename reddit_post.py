@@ -184,7 +184,7 @@ def submit_full_text_comment():
     reddit_submission_text = re.sub("(> \n)", "", reddit_submission_text)
 
     comment = reddit_submission.submission.reply(
-        "[{away_link_hint}]({full_url}) \n\n{full_text_hint}: {full_text}".format(
+        "[{away_link_hint}]({full_url}) \n\n{full_text_hint} {full_text}".format(
             away_link_hint=regular_source_settings['away_link_text'],
             full_url=url_post,
             full_text_hint=regular_source_settings['full_text_hint'],
