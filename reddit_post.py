@@ -167,7 +167,7 @@ def spoilers_test():
 
 def text_contains_any_item(subject, items):
     for i in range(len(items)):
-        if items[i] in subject:
+        if items[i] in subject.lower():
             return True
     return False
 
