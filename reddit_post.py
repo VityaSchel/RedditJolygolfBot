@@ -255,23 +255,25 @@ def initialize():
     else:
         submit_text()
 
-    if original_post.flair_id != "not-specified":
-        reddit_submission.submission.flair.select(original_post.flair_id, get_flair())
+    if bot_settings['is_moderator']:
 
-    url_post_id = original_post.src_post_id
-    away_link_url = regular_source_settings['away_link_format']
-    url_post = away_link_url.format(urlid=url_post_id,
-                                    src_id=original_post_source.src_id,
-                                    sourcespec=original_post_source.src_spec)
+        if original_post.flair_id != "not-specified" :
+            reddit_submission.submission.flair.select(original_post.flair_id, get_flair())
 
-    if not reddit_submission.post_comment_with_source_text:
-        submit_common_comment()
-    else:
-        submit_full_text_comment()
+        url_post_id = original_post.src_post_id
+        away_link_url = regular_source_settings['away_link_format']
+        url_post = away_link_url.format(urlid=url_post_id,
+                                        src_id=original_post_source.src_id,
+                                        sourcespec=original_post_source.src_spec)
 
-    spoilers_test()
+        if not reddit_submission.post_comment_with_source_text:
+            submit_common_comment()
+        else:
+            submit_full_text_comment()
 
-    reddit_submission.submission.mod.approve()
+        spoilers_test()
+
+        reddit_submission.submission.mod.approve()
 
 
 logging.basicConfig(filename=WORK_DIR + '/logs/reddit_post.log', level=logging.DEBUG)
