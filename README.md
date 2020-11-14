@@ -40,9 +40,11 @@ Check examples in [/configs/](/configs/)
 {
   "bot_username": "Reddit account login",
   "bot_useragent": "Reddit will ban you if you keep this empty, usually looks like r/SUBREDDIT bot by /u/USERNAME",
-  "subreddit": "Subreddit name without r/"
+  "subreddit": "Subreddit name without r/",
+  "is_moderator": true or false
 }
 ```
+if you set "is_moderator" to false, [reddit_post.py](/reddit_post.py) won't set flair and spoiler tag, approve post, post a comment
 
 **regular_source_settings.conf**
 ```yaml
