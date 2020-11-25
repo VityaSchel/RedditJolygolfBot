@@ -180,8 +180,7 @@ def submit_full_text_comment():
     source_post_text = original_post.text.splitlines()
     reddit_submission_text = ""
     for line in source_post_text:
-        reddit_submission_text += '\n> {l}'.format(l=line)
-    reddit_submission_text = re.sub("(> \n)", "", reddit_submission_text)
+        reddit_submission_text += '\n> {l} \n'.format(l=line)
 
     comment = reddit_submission.submission.reply(
         "[{away_link_hint}]({full_url}) \n\n{full_text_hint} {full_text}".format(
