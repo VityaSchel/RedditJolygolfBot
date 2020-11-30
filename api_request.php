@@ -78,7 +78,7 @@ foreach($vk_api_response['response']['items'] as $vk_post){
 
   $post_data['title'] = str_replace(";",",", $vk_post['text']);
   if($post_data['title'] == ""){
-    $post_data['title'] = str_replace("_", " ", $options['sourcename']);
+    $post_data['title'] = str_replace("_", " ", $options['deftitle']);
   }
   $post_data['title'] = base64_encode($post_data['title']);
 
