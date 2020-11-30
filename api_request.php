@@ -1,11 +1,9 @@
 <?php
 
-// filepath syntax: work_dir/api_request.php --id -88245281 --sourcespec NaPriemeUShevcova --sourcename На_приеме_у_Шевцова --sourceshort Паблик
-// options --flairid="{flair id}", --skipdownload --ignorecache
-
 $longopts = array(
   "id:",
   "sourcespec:",
+  "deftitle:",
   "sourcename:",
   "sourceshort:",
   "flairid::",
@@ -28,7 +26,6 @@ $vk_api_response_raw = file_get_contents(file_get_contents(WORK_DIR."/secrets/vk
 $vk_api_response = json_decode($vk_api_response_raw, true);
 
 if(!empty($vk_api_response['response']['items'][0]['is_pinned'])){
-  // post pinned, skip to newest after it
   $vk_api_response_raw = file_get_contents(file_get_contents(WORK_DIR."/secrets/vk_api.txt").$source_post_id."&offset=1");
   $vk_api_response = json_decode($vk_api_response_raw, true);
 }
@@ -105,7 +102,7 @@ foreach($vk_api_response['response']['items'] as $vk_post){
 
           case "doc":
             if($attachment['doc']['type'] == 3) {
-              // 3 means gif-document in vk api
+              // 3 = gif-document in vk api
               $post_data['type'] = "gif";
               $post_data['title'] .= "\n [".$regular_source_settings->gif_link_hint."](".$attachment['doc']['url'].")";
             } else {
@@ -163,6 +160,6 @@ foreach($vk_api_response['response']['items'] as $vk_post){
   } else {
     $flair_id = $options['flairid'];
   }
-  exec('python3 '.WORK_DIR.'/reddit_post.py '.$options['id'].' '.$options['sourcespec'].' '.$options['sourcename'].' '.$options['sourceshort'].' '.$flair_id);
+  exec('python3 '.WORK_DIR.'/reddit_post.py '.$options['id'].' '.$options['sourcespec'].' '.$options['deftitle'].' '.$options['sourcename'].' '.$options['sourceshort'].' '.$flair_id);
 }
 ?>

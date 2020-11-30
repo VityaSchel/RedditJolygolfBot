@@ -25,16 +25,17 @@ regular_source_settings = json.loads(open(WORK_DIR + "/configs/regular_source_se
 
 class RedditSubmission:
     def __init__(self, post_title, post_a_comment, submission):
-        self.title = post_title,
+        self.title = post_title
         self.post_comment_with_source_text = post_a_comment
         self.submission = submission
 
 
 class OriginalPostSource:
-    def __init__(self, source_id, source_specification_code, source_name_full, source_name_short):
-        self.src_id = source_id,
+    def __init__(self, source_id, source_specification_code, default_title, source_name_full, source_name_short):
+        self.src_id = source_id
         self.src_spec = source_specification_code
         self.src_name_full = source_name_full.replace("_", " ")
+        self.src_name_title = default_title.replace("_", " ")
         self.src_name_short = source_name_short.replace("_", " ")
 
 
@@ -84,7 +85,7 @@ def get_title():
         return original_post.text
     else:
         reddit_submission.post_comment_with_source_text = True
-        return original_post_source.src_name_full + " (текст записи в комментариях)"
+        return original_post_source.src_name_title + " (текст записи в комментариях)"
 
 
 def submit_pictures():
@@ -231,7 +232,7 @@ def initialize():
 
     reddit_api = get_reddit_api()
 
-    original_post_source = OriginalPostSource(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4])
+    original_post_source = OriginalPostSource(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
     original_post_raw = json.loads(open(WORK_DIR + "/resources/data/" + original_post_source.src_spec + ".txt",
                                         mode="r", encoding="utf-8").read())
     original_post = FetchedPost(original_post_raw['type'],
@@ -242,7 +243,7 @@ def initialize():
                                 original_post_raw['title'],
                                 original_post_raw['images_count'],
                                 original_post_raw['post_id'],
-                                sys.argv[5])
+                                sys.argv[6])
     reddit_submission = RedditSubmission("", False, None)
 
     if original_post.post_type == "img":
