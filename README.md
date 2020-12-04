@@ -9,13 +9,24 @@ If you want to use it for your subreddit, check [this step-by-step tutorial](How
 ## Short overview
 ### Root files
 **NaPriemeUShevcova.php, AlexeyShevcov.php, JolyBell.php, BananoviyRai.php**\
-These PHP scripts are executing **api_request.php** script with specified parameters. They sheduled in cron.
+These PHP scripts are executing **api_request.php** script with specified parameters. These files sheduled in crontab
 
 **api_request.php**\
-This PHP script work with VKontakte API and filtering data from fetched response
+This PHP script work with VKontakte API and filtering data from fetched response\
+Required parameters:
+* `--id` is id of vkontakte group or vkontakte user (e.g. `-88245281`)
+* `--sourcespec` is any word or term you use to split different sources (e.g. `NaPriemeUShevcova`, `BananoviyRai`)
+* `--deftitle` is default title for post where _ is replaced by space (e.g. `На_приеме_у_Шевцова`)
+* `--sourcename` is name of source where _ is replaced by space (used in flairs, e.g. `:i:_На_приеме_у_Шевцова`)
+* `--sourceshort` is short name of source where _ is replaced by space (used in flairs, e.g. `:i:Паблик`)
+
+Optional parameters:
+* `--flairid` is flair id on reddit (e.g. `2ea55bd8-e3e6-11ea-8a5c-0e7cceef0c57`)
+* `--ignorecache` is set when you want to ignore cached id of last post (it has no value)
+* `--skipdownload` is set when you want to skip video downloading (it has no value)
 
 **reddit_post.py**\
-This Python scripts work with Reddit API and posts submissions and comments to sub
+This Python scripts work with Reddit API and posts submissions and comments to sub. Parameters should be in the same order as api_request.php but without names (`--id`, `--deftitle` etc). If you don't want to add flair to post, use "not-specified" instead of flair id.
 
 **ItpediaYoutube.php**\
 This script executing **youtube_api.php** with specified parameters to get video from [Itpedia's channel](https://www.youtube.com/user/itpediachannel). It sheduled in cron.
