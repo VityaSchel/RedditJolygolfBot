@@ -132,7 +132,7 @@ def submit_video():
 
     title = get_title()
     if regular_source_settings['upload_videos_to_reddit']:
-        reddit_submission.submission = reddit_api.subreddit(['subreddit']).submit_video(title,
+        reddit_submission.submission = reddit_api.subreddit(bot_settings['subreddit']).submit_video(title,
                                                                                         WORK_DIR + "/resources/video/" + original_post_source.src_spec + "_video.mp4",
                                                                                         False,
                                                                                         WORK_DIR + "/resources/video/" + original_post_source.src_spec + "_thumbnail.jpg")

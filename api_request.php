@@ -50,6 +50,21 @@ function download_photo_from_vk($attached_photo, $iteration)
   $post_data['images_count'] = $photo_iter;
 }
 
+function download_video_from_vk($attached_video, $video_url) {
+  global $options;
+  global $regular_source_settings;
+
+  $thumbnails_variants = $attached_video['video']['image'];
+  $thumbnail_url = end($thumbnails_variants)["url"];
+  file_put_contents(WORK_DIR.'/resources/video/'.$options['sourcespec'].'_thumbnail.jpg', file_get_contents($thumbnail_url));
+
+  if(array_key_exists('skipdownload', $options) != true){
+    $vid_download_options = "bestvideo[height<='.$regular_source_settings->max_video_resolution.']+bestaudio/best[height<='.$regular_source_settings->max_video_resolution.']";
+    $youtubedl = 'youtube-dl https://vk.com/video'.$video_url.' -o '.WORK_DIR.'/resources/video/'.$options['sourcespec'].'_video.mp4 --no-continue -f '.$vid_download_options;
+    exec($youtubedl);
+  }
+}
+
 foreach($vk_api_response['response']['items'] as $vk_post){
   $post_id = $vk_post['id'];
   $last_submitted_id = file_get_contents(WORK_DIR."/".$options['sourcespec']."_last_posted_id.txt");
@@ -125,13 +140,7 @@ foreach($vk_api_response['response']['items'] as $vk_post){
             $video_url = $attachment['video']['owner_id']."_".$attachment['video']['id'];
             $post_data['video_data'] = $video_url;
             if($regular_source_settings->upload_videos_to_reddit) {
-              $thumbnails_variants = $attachment['video']['image'];
-              $thumbnail_url = end($thumbnails_variants)["url"];
-              file_put_contents(WORK_DIR.'/resources/video/'.$options['sourcespec'].'_thumbnail.jpg', file_get_contents($thumbnail_url));
-
-              if(array_key_exists('skipdownload', $options) != true){
-                exec('youtube-dl https://vk.com/video'.$video_url.' -o '.WORK_DIR.'/resources/video/'.$options['sourcespec'].'_video.mp4 -f "bestvideo[height<='.$regular_source_settings->max_video_resolution.']+bestaudio/best[height<='.$regular_source_settings->max_video_resolution.']"');
-              }
+              download_video_from_vk($attachment, $video_url);
             }
             break;
 
