@@ -59,9 +59,9 @@ function download_video_from_vk($attached_video, $video_url) {
   file_put_contents(WORK_DIR.'/resources/video/'.$options['sourcespec'].'_thumbnail.jpg', file_get_contents($thumbnail_url));
 
   if(array_key_exists('skipdownload', $options) != true){
-    $vid_download_options = "bestvideo[height<='.$regular_source_settings->max_video_resolution.']+bestaudio/best[height<='.$regular_source_settings->max_video_resolution.']";
+    $vid_download_options = '"bestvideo[height<='.$regular_source_settings->max_video_resolution.']+bestaudio/best[height<='.$regular_source_settings->max_video_resolution.']"';
     $youtubedl = 'youtube-dl https://vk.com/video'.$video_url.' -o '.WORK_DIR.'/resources/video/'.$options['sourcespec'].'_video.mp4 --no-continue -f '.$vid_download_options;
-    exec($youtubedl);
+    shell_exec($youtubedl);
   }
 }
 
