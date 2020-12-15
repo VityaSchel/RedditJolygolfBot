@@ -21,7 +21,6 @@ if(empty($options['id'])){
 }
 
 $regular_source_settings = json_decode(file_get_contents(WORK_DIR."/configs/regular_source_settings.conf"));
-
 $vk_api_response_raw = file_get_contents(file_get_contents(WORK_DIR."/secrets/vk_api.txt").$source_post_id);
 $vk_api_response = json_decode($vk_api_response_raw, true);
 
@@ -60,7 +59,7 @@ function download_video_from_vk($attached_video, $video_url) {
 
   if(array_key_exists('skipdownload', $options) != true){
     $vid_download_options = '"bestvideo[height<='.$regular_source_settings->max_video_resolution.']+bestaudio/best[height<='.$regular_source_settings->max_video_resolution.']"';
-    $youtubedl = 'youtube-dl https://vk.com/video'.$video_url.' -o '.WORK_DIR.'/resources/video/'.$options['sourcespec'].'_video.mp4 --no-continue -f '.$vid_download_options;
+    $youtubedl = 'sudo youtube-dl https://vk.com/video'.$video_url.' -o '.WORK_DIR.'/resources/video/'.$options['sourcespec'].'_video.mp4 --no-continue -f '.$vid_download_options;
     shell_exec($youtubedl);
   }
 }

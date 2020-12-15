@@ -247,7 +247,10 @@ def initialize():
     reddit_submission = RedditSubmission("", False, None)
 
     if original_post.post_type == "img":
-        submit_pictures()
+        try:
+            submit_pictures()
+        except WebSocketTimeoutException:
+            print("websockets are broken");
     elif original_post.post_type == "poll":
         submit_poll()
     elif original_post.post_type == "video":
