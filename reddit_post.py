@@ -115,7 +115,7 @@ def submit_poll():
     global bot_settings
     global original_post
 
-    title = original_post_source.src_name_full
+    title = original_post_source.src_name_title
     reddit_submission.submission = reddit_api.subreddit(bot_settings['subreddit']).submit_poll(title,
                                                                                                selftext=original_post.text,
                                                                                                options=original_post.poll_data[:6],
