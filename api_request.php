@@ -64,6 +64,7 @@ function download_video_from_vk($attached_video, $video_url) {
   }
 }
 
+$post_data['video_downloaded'] = false;
 foreach($vk_api_response['response']['items'] as $vk_post){
   $post_id = $vk_post['id'];
   $last_submitted_id = file_get_contents(WORK_DIR."/".$options['sourcespec']."_last_posted_id.txt");
@@ -138,7 +139,6 @@ foreach($vk_api_response['response']['items'] as $vk_post){
             $post_data['type'] = "video";
             $video_url = $attachment['video']['owner_id']."_".$attachment['video']['id'];
             $post_data['video_data'] = $video_url;
-            $post_data['video_downloaded'] = false;
             $max_video_length = 600;
             if($attachment['video']['duration'] < $max_video_length){
               if(array_key_exists("platform", $attachment['video']['platform']) != true){
