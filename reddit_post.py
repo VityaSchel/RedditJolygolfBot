@@ -41,7 +41,7 @@ class OriginalPostSource:
 
 class FetchedPost:
     def __init__(self, post_type, post_likes, post_reposts, post_comments, post_views, post_title,
-                 post_attachments_count, source_post_id, flairid):
+                 post_attachments_count, source_post_id, video_downloaded, flairid):
         self.post_type = post_type
         if "poll_data" in original_post_raw:
             self.poll_data = original_post_raw['poll_data']
@@ -54,6 +54,7 @@ class FetchedPost:
         self.text = base64.b64decode(post_title).decode('utf-8')
         self.attachments_count = post_attachments_count
         self.src_post_id = source_post_id.split("_")[1]
+        self.video_downloaded = video_downloaded
         self.flair_id = flairid
 
 
@@ -131,15 +132,15 @@ def submit_video():
     global bot_settings
 
     title = get_title()
-    if regular_source_settings['upload_videos_to_reddit']:
+    if not original_post.video_downloaded or not regular_source_settings['upload_videos_to_reddit']:
+        video_url_vk_api = "https://vkontakte.ru/video"
+        reddit_submission.submission = reddit_api.subreddit(bot_settings['subreddit']).submit(title,
+                                                                                              url=video_url_vk_api + original_post.video_data)
+    else:
         reddit_submission.submission = reddit_api.subreddit(bot_settings['subreddit']).submit_video(title,
                                                                                         WORK_DIR + "/resources/video/" + original_post_source.src_spec + "_video.mp4",
                                                                                         False,
                                                                                         WORK_DIR + "/resources/video/" + original_post_source.src_spec + "_thumbnail.jpg")
-    else:
-        video_url_vk_api = "https://vkontakte.ru/video"
-        reddit_submission.submission = reddit_api.subreddit(bot_settings['subreddit']).submit(title,
-                                                                                              url=video_url_vk_api + original_post.video_data)
 
 
 def submit_text():
@@ -243,6 +244,7 @@ def initialize():
                                 original_post_raw['title'],
                                 original_post_raw['images_count'],
                                 original_post_raw['post_id'],
+                                original_post_raw['video_downloaded'],
                                 sys.argv[6])
     reddit_submission = RedditSubmission("", False, None)
 

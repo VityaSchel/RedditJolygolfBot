@@ -138,8 +138,15 @@ foreach($vk_api_response['response']['items'] as $vk_post){
             $post_data['type'] = "video";
             $video_url = $attachment['video']['owner_id']."_".$attachment['video']['id'];
             $post_data['video_data'] = $video_url;
-            if($regular_source_settings->upload_videos_to_reddit) {
-              download_video_from_vk($attachment, $video_url);
+            $post_data['video_downloaded'] = false;
+            $max_video_length = 600;
+            if($attachment['video']['duration'] < $max_video_length){
+              if(array_key_exists("platform", $attachment['video']['platform']) != true){
+                if($regular_source_settings->upload_videos_to_reddit) {
+                  $post_data['video_downloaded'] = true;
+                  download_video_from_vk($attachment, $video_url);
+                }
+              }
             }
             break;
 
