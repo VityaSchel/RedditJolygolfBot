@@ -7,6 +7,7 @@ $longopts = array(
   "sourcename:",
   "sourceshort:",
   "flairid::",
+  "offset::",
   "ignorecache",
   "skipdownload",
 );
@@ -21,11 +22,25 @@ if(empty($options['id'])){
 }
 
 $regular_source_settings = json_decode(file_get_contents(WORK_DIR."/configs/regular_source_settings.conf"));
-$vk_api_response_raw = file_get_contents(file_get_contents(WORK_DIR."/secrets/vk_api.txt").$source_post_id);
+$api_endpoint = file_get_contents(WORK_DIR."/secrets/vk_api.txt");
+
+if(array_key_exists('offset', $options) != true){
+  $post_offset = 0;
+} else {
+  $post_offset = $options['offset'];
+}
+
+$api_endpoint = str_replace("{id}", $source_post_id, $api_endpoint);
+$api_endpoint = str_replace("{offset}", $post_offset, $api_endpoint);
+$vk_api_response_raw = file_get_contents($api_endpoint);
 $vk_api_response = json_decode($vk_api_response_raw, true);
 
 if(!empty($vk_api_response['response']['items'][0]['is_pinned'])){
-  $vk_api_response_raw = file_get_contents(file_get_contents(WORK_DIR."/secrets/vk_api.txt").$source_post_id."&offset=1");
+  $api_endpoint = file_get_contents(WORK_DIR."/secrets/vk_api.txt");
+  $post_offset += 1;
+  $api_endpoint = str_replace("{id}", $source_post_id, $api_endpoint);
+  $api_endpoint = str_replace("{offset}", $post_offset, $api_endpoint);
+  $vk_api_response_raw = file_get_contents($api_endpoint);
   $vk_api_response = json_decode($vk_api_response_raw, true);
 }
 
@@ -98,12 +113,12 @@ foreach($vk_api_response['response']['items'] as $vk_post){
   $post_data['title'] = base64_encode($post_data['title']);
 
   $post_attachments = $vk_post['attachments'];
+  $post_data['images_count'] = 0;
   if(empty($post_attachments)){
     $post_data['type'] = 'text';
   } else {
     $max_allowed_attachments = 5;
     $attachments_saved = 0;
-    $post_data['images_count'] = 0;
     foreach($post_attachments as $attachment){
       if($attachments_saved >= $max_allowed_attachments){
         break;
