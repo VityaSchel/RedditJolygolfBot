@@ -1,16 +1,33 @@
 # RedditJolygolfBot
 Бот для сабреддита [r/Jolygolf](https://www.reddit.com/r/Jolygolf/) о видеоблоггере Алексее Шевцове. Умеет постить изображения, опросы, ссылки из разных источников как VK и YouTube
 
+![RedditJolygolfBot](https://jolybot.utidteam.com/jolygolf_banner.png)
+
+## Как использовать бота?
+Если вы хотите использовать бота для своего сабреддита, прочитайте [этот туториал шаг-за-шагом](HowToSetup.md)
+
 ## Краткий обзор
 ### Корневые файлы
 **NaPriemeUShevcova.php, AlexeyShevcov.php, JolyBell.php, BananoviyRai.php**\
 Эти PHP скрипты запускают **api_request.php** с особыми параметрами. Их запуск запланирован в cron.
 
 **api_request.php**\
-Этот PHP скрипт работает с API Вконтакте и фильтрует информацию из ответа
+Этот PHP скрипт работает с API Вконтакте и фильтрует информацию из ответа\
+Обязательные параметры:
+* `--id` это id группы вконтакте или пользователь вконтакте, значение заменяет собой {id} в vk_api.txt (прим. `-88245281`)
+* `--sourcespec` это любой термин который используется для идентификации разных источников (прим. `NaPriemeUShevcova`, `BananoviyRai`)
+* `--deftitle` это заголовок поста по умолчанию, где _ заменяется на пробел (прим. `На_приеме_у_Шевцова`)
+* `--sourcename` это название источника, где _ заменяется на пробел (исп. в флаерах, прим. `:i:_На_приеме_у_Шевцова`)
+* `--sourceshort` это короткое название источника, где _ заменяется на пробел (исп. в флаерах, прим. `:i:Паблик`)
+
+Необязательные параметры:
+* `--flairid` это id флаера на реддите (прим. `2ea55bd8-e3e6-11ea-8a5c-0e7cceef0c57`)
+* `--offset` это отступ количества постов, заменяет собой {offset} в vk_api.txt (прим. `2`)
+* `--ignorecache` ставится, если вы хотите пропустить проверку дубликации поста (не имеет значений)
+* `--skipdownload` ставится, если вы хотите пропустить загрузку видео с сервера ВК (не имеет значений)
 
 **reddit_post.py**\
-Скрипт Python, работающий с PRAW и публикующий новые посты
+Скрипт Python, работающий с PRAW и публикующий новые посты. Параметры должны быть в том же порядке как и в api_request.php, но без имен (`--id`, `--deftitle` и т.д.). Если вы не хотите использовать флаер, поставьте `not-specified` вместо id.
 
 **ItpediaYoutube.php**\
 Этот скрипт запускает **youtube_api.php** с особыми параметрами для проверки новых видео на [Канале Itpedia](https://www.youtube.com/user/itpediachannel). Запуск запланирован в cron.
@@ -35,9 +52,11 @@ Check examples in [/configs/](/configs/)
 {
   "bot_username": "Логин аккаунта на реддите",
   "bot_useragent": "Реддит может забанить, если оставить это пустым, выглядит так: r/SUBREDDIT bot by /u/USERNAME",
-  "subreddit": "Название сабреддита без r/"
+  "subreddit": "Название сабреддита без r/",
+  "is_moderator": true или false
 }
 ```
+если вы установите is_moderator в false, [reddit_post.py](/reddit_post.py) не станет добавлять флаер и тег спойлера, одобрять (approve) пост, писать к нему комментарий
 
 **regular_source_settings.conf**
 ```yaml
@@ -105,3 +124,21 @@ Check examples in [/configs/](/configs/)
 
 ### secrets (директория)
 Для приватной информации: пароли, ключи api, рабочая директория
+
+#### /secrets/reddit_client_id.txt
+Client ID which reddit generates on reddit apps page
+
+#### /secrets/reddit_client_secret.txt
+Client secrete which reddit generates on reddit apps page
+
+#### /secrets/reddit_client_password.txt
+Account password with which app was created on reddit apps page
+
+#### /secrets/vk_api.txt
+VK API endpoint. May contain {id}, {offset} text variables. Read more in [HowToSetup.md](/HowToSetup.md)
+
+#### /secrets/work_dir.txt
+Path to repository root (e.g. `/etc/VityaSchel/RedditJolygolfBot/`)
+
+#### /secrets/youtube_api.txt
+YouTube API endpoint. Read more in [HowToSetup.md](HowToSetup.md)
