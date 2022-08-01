@@ -3,6 +3,10 @@
 
 ![RedditJolygolfBot](https://jolybot.utidteam.com/jolygolf_banner.png)
 
+# ❗️АРХИВИРОВАНО❗️
+
+Этот бот больше не работает в r/Jolygolf потому что левацкий реддит забанил мой аккаунт пермачом ([угадайте за что](https://github.com/VityaSchel/figma-no-rainbow-loader/)). Читать больше: <https://www.reddit.com/r/Jolygolf/comments/vkf9bv/всем_спасибо_всем_пока/>.
+
 ## Как использовать бота?
 Если вы хотите использовать бота для своего сабреддита, прочитайте [этот туториал шаг-за-шагом](HowToSetup.md)
 
