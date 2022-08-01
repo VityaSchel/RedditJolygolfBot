@@ -3,6 +3,10 @@ Reddit bot for [r/Jolygolf](https://www.reddit.com/r/Jolygolf/). Subreddit about
 
 [![RedditJolygolfBot](https://jolybot.utidteam.com/jolygolf_banner.png)](https://reddit.com/r/jolygolf)
 
+# ❗️ARCHIVED❗️
+
+This bot no longer works in r/Jolygolf because leftist reddit permanently banned my account ([guess why](https://github.com/VityaSchel/figma-no-rainbow-loader/)). Read more: <https://www.reddit.com/r/Jolygolf/comments/vkf9bv/всем_спасибо_всем_пока/>.
+
 ## How to use it?
 If you want to use it for your subreddit, check [this step-by-step tutorial](HowToSetup.md)
 
